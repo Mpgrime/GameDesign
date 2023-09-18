@@ -1,1 +1,1 @@
-# GameDesign
+The github for COSC438, with Malik, Marjon, Matthew, and Xan
