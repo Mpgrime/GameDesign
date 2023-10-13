@@ -2,7 +2,7 @@ pico-8 cartridge // http://www.pico-8.com
 version 41
 __lua__
 --cat game
---by xan weatherholtz, malik hill
+--by xan weatherholtz, malik hill, hello
 
 function _init()
  frame=1
