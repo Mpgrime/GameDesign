@@ -1,227 +1,256 @@
 pico-8 cartridge // http://www.pico-8.com
 version 41
 __lua__
+
 --cat game
 --by xan weatherholtz, matthew grimelli, malik hill, marjon ward
 
 function _init()
- frame=1
- catpos={x=56,y=56}
- pose=7 --frame when still
- flipped=false
- 
- --chair locations:
- chairx={40,80,30,10}
- chairy={70,90,20,100}
- --chair bottom locations:
- bchairx={40,80,30,10}
- bchairy={78,98,28,108}
- --ball locations:
-	ballposx={60,20}
-	ballposy={80,40}
- 
- cw=14 --cat width
- ch=14 --cat height
- chairw=14 --chair width
- chairh=16 --chair height
- ballw=6 --ball width
- ballh=6 --ball height
- bchairw=14
- bchairh=7
- cupframe=38
- cupflip=false --true if cup reflected
+	frame = 1
+	catpos = { x = 56, y = 56 }
+	pose = 7
+	--frame when still
+	flipped = false
+
+	--chair locations:
+	chairx = { 40, 80, 30, 10 }
+	chairy = { 70, 90, 20, 100 }
+	--chair bottom locations:
+	bchairx = { 40, 80, 30, 10 }
+	bchairy = { 78, 98, 28, 108 }
+	--ball locations:
+	ballposx = { 60, 20 }
+	ballposy = { 80, 40 }
+
+	cw = 14
+	--cat width
+	ch = 14
+	--cat height
+	chairw = 14
+	--chair width
+	chairh = 16
+	--chair height
+	ballw = 6
+	--ball width
+	ballh = 6
+	--ball height
+	bchairw = 14
+	bchairh = 7
+	cupframe = 38
+	cupflip = false
+	--true if cup reflected
 end
 
-
 function _update()
-	flist={pose,pose,pose} --if no buttons pressed
+	flist = { pose, pose, pose }
+	--if no buttons pressed
 	--canmove=true
 
 	--frame change
- if frame<3.9 then
- 	frame+=.3 --sets anim speed
- else
- 	frame=1
- end
- 
- --arrow controls
- if btn(⬆️) then
- 	local canmove=true
- 	for i=1,4 do
- 		--if col w/ bchair, can't move:
- 		if collision(catpos.x,catpos.y-1,cw,ch,
- 															bchairx[i],bchairy[i],bchairw,bchairh) then
- 			canmove=false
- 		end
- 		--if col w/ ball, ball moves:
- 		if i<3 and
- 					collision(catpos.x,catpos.y-1,cw,ch,
- 															ballposx[i],ballposy[i],ballw,ballh) then
- 			ballposy[i]-=1
- 		end								
- 	end
- 	--if col w/ cup
- 	if collision(catpos.x,catpos.y-1,cw,ch,
- 															90,10,8,8) then 															
- 			canmove=false
- 	end
- 	--pos change if able:
- 	if(canmove) then catpos.y-=1 end
- 	--frame set change
- 	flist={32,34,36}
- 	--pose change
- 	pose=32
- 	--no sprite flipping
- 	flipped=false
- end
- if btn(⬇️) then
- 	local canmove=true
- 	for i=1,4 do
- 		--if col w/ bchair, can't move:
- 		if collision(catpos.x,catpos.y+1,cw,ch,
- 															bchairx[i],bchairy[i],bchairw,bchairh) then
- 			canmove=false
- 		end
- 		--if col w/ ball, ball moves:
- 		if i<3 and
- 					collision(catpos.x,catpos.y+1,cw,ch,
- 															ballposx[i],ballposy[i],ballw,ballh) then
- 			ballposy[i]+=1
- 		end								
- 	end
- 	--if col w/ cup
- 	if collision(catpos.x,catpos.y+1,cw,ch,
- 															90,10,8,8) then 															
- 			canmove=false
- 	end
- 	--pos change if able:
- 	if(canmove) then catpos.y+=1 end
- 	flist={7,9,11}
- 	pose = 7
- 	flipped=false
- end
- if btn(⬅️) then 	
- 	local canmove=true
- 	for i=1,4 do
- 		--if col w/ bchair, can't move:
- 		if collision(catpos.x-1,catpos.y,cw,ch,
- 															bchairx[i],bchairy[i],bchairw,bchairh) then
- 			canmove=false
- 		end
- 		--if col w/ ball, ball moves:
- 		if i<3 and
- 					collision(catpos.x-1,catpos.y,cw,ch,
- 															ballposx[i],ballposy[i],ballw,ballh) then
- 			ballposx[i]-=1
- 		end													
- 	end
- 	--if col w/ cup, change cup
- 	if collision(catpos.x-1,catpos.y,cw,ch,
- 															90,10,8,8) then 															
- 			canmove=false
- 			if cupframe==38 then --if not already changed
- 				cupframe=54
- 			end
- 	end
- 	--pos change if able:
- 	if(canmove) then catpos.x-=1 end
- 	flist={1,3,5}
- 	pose=1
- 	flipped=false
- end
- if btn(➡️) then
- 
- 	local canmove=true
- 	for i=1,4 do
- 		--if col w/ bchair, can't move:
- 		if collision(catpos.x+1,catpos.y,cw,ch,
- 															bchairx[i],bchairy[i],bchairw,bchairh) then
- 		canmove=false
- 		end
- 		--if col w/ ball, ball moves:
- 		if i<3 and
- 					collision(catpos.x+1,catpos.y,cw,ch,
- 															ballposx[i],ballposy[i],ballw,ballh) then
- 			ballposx[i]+=1
- 		end			
- 	end
- 	--if col w/ cup, change cup
- 	if collision(catpos.x+1,catpos.y,cw,ch,
- 															90,10,8,8) then 															
- 			canmove=false
- 			if cupframe==38 then --if not already changed
- 				cupframe=54
- 				cupflip=true
- 			end
- 	end
- 	--pos change if able:
- 	if(canmove) then catpos.x+=1 end
- 	--catpos.x+=1
- 	flist={1,3,5}
- 	pose=1
- 	flipped=true --backwards ⬅️ sprite
- end
- 
-end
+	if frame < 3.9 then
+		frame += .3 --sets anim speed
+	else
+		frame = 1
+	end
 
+	--arrow controls
+	if btn(⬆️) then
+		local canmove = true
+		for i = 1, 4 do
+			--if col w/ bchair, can't move:
+			if collision(catpos.x, catpos.y - 1, cw, ch, bchairx[i], bchairy[i], bchairw, bchairh) then
+				canmove = false
+			end
+			--if col w/ ball, ball moves:
+			if i < 3
+					and collision(
+				catpos.x, catpos.y - 1, cw, ch,
+				ballposx[i], ballposy[i], ballw, ballh
+			) then
+				ballposy[i] -= 1
+			end
+		end
+		--if col w/ cup
+		if collision(
+			catpos.x, catpos.y - 1, cw, ch,
+			90, 10, 8, 8
+		) then
+			canmove = false
+		end
+		--pos change if able:
+		if canmove then catpos.y -= 1 end
+		--frame set change
+		flist = { 32, 34, 36 }
+		--pose change
+		pose = 32
+		--no sprite flipping
+		flipped = false
+	end
+	if btn(⬇️) then
+		local canmove = true
+		for i = 1, 4 do
+			--if col w/ bchair, can't move:
+			if collision(
+				catpos.x, catpos.y + 1, cw, ch,
+				bchairx[i], bchairy[i], bchairw, bchairh
+			) then
+				canmove = false
+			end
+			--if col w/ ball, ball moves:
+			if i < 3
+					and collision(
+				catpos.x, catpos.y + 1, cw, ch,
+				ballposx[i], ballposy[i], ballw, ballh
+			) then
+				ballposy[i] += 1
+			end
+		end
+		--if col w/ cup
+		if collision(
+			catpos.x, catpos.y + 1, cw, ch,
+			90, 10, 8, 8
+		) then
+			canmove = false
+		end
+		--pos change if able:
+		if canmove then catpos.y += 1 end
+		flist = { 7, 9, 11 }
+		pose = 7
+		flipped = false
+	end
+	if btn(⬅️) then
+		local canmove = true
+		for i = 1, 4 do
+			--if col w/ bchair, can't move:
+			if collision(
+				catpos.x - 1, catpos.y, cw, ch,
+				bchairx[i], bchairy[i], bchairw, bchairh
+			) then
+				canmove = false
+			end
+			--if col w/ ball, ball moves:
+			if i < 3
+					and collision(
+				catpos.x - 1, catpos.y, cw, ch,
+				ballposx[i], ballposy[i], ballw, ballh
+			) then
+				ballposx[i] -= 1
+			end
+		end
+		--if col w/ cup, change cup
+		if collision(
+			catpos.x - 1, catpos.y, cw, ch,
+			90, 10, 8, 8
+		) then
+			canmove = false
+			if cupframe == 38 then
+				--if not already changed
+				cupframe = 54
+			end
+		end
+		--pos change if able:
+		if canmove then catpos.x -= 1 end
+		flist = { 1, 3, 5 }
+		pose = 1
+		flipped = false
+	end
+	if btn(➡️) then
+		local canmove = true
+		for i = 1, 4 do
+			--if col w/ bchair, can't move:
+			if collision(
+				catpos.x + 1, catpos.y, cw, ch,
+				bchairx[i], bchairy[i], bchairw, bchairh
+			) then
+				canmove = false
+			end
+			--if col w/ ball, ball moves:
+			if i < 3
+					and collision(
+				catpos.x + 1, catpos.y, cw, ch,
+				ballposx[i], ballposy[i], ballw, ballh
+			) then
+				ballposx[i] += 1
+			end
+		end
+		--if col w/ cup, change cup
+		if collision(
+			catpos.x + 1, catpos.y, cw, ch,
+			90, 10, 8, 8
+		) then
+			canmove = false
+			if cupframe == 38 then
+				--if not already changed
+				cupframe = 54
+				cupflip = true
+			end
+		end
+		--pos change if able:
+		if canmove then catpos.x += 1 end
+		--catpos.x+=1
+		flist = { 1, 3, 5 }
+		pose = 1
+		flipped = true --backwards ⬅️ sprite
+	end
+end
 
 function _draw()
- cls()
- map(0,0,0,0,16,16) --draws map
- --🐱 cat sprite:
- spr(flist[flr(frame)],catpos.x,catpos.y,2,2,flipped)
- 	--flr rounds down to nearest int
- 	--gets item 1-3 from flist
- 	--spr(framenum,x,y,framesize,framesize,flipped?)
- --chair + ball sprites:
- spr(42,chairx[1],chairy[1],2,2)
- spr(42,chairx[2],chairy[2],2,2)
- spr(42,chairx[3],chairy[3],2,2)
- spr(42,chairx[4],chairy[4],2,2,true)
- spr(44,ballposx[1],ballposy[1],1,1)
- spr(44,ballposx[2],ballposy[2],1,1)
- 
- --bottoms of chairs sprites
- spr(45,bchairx[1],bchairy[1],2,2)
- spr(45,bchairx[2],bchairy[2],2,2)
- spr(45,bchairx[3],bchairy[3],2,2)
- spr(45,bchairx[4],bchairy[4],2,2,true)
- 
- --cup sprite:
- spr(cupframe,90,10,1,1,cupflip)
- --water sprite:
- if cupframe==54 then
- 	if cupflip then
- 		spr(39,98,10,1,1,true)
- 	else
- 		spr(39,82,10,1,1)
- 	end
- end
-end
+	cls()
+	map(0, 0, 0, 0, 16, 16)
+	--draws map
+	--🐱 cat sprite:
+	spr(flist[flr(frame)], catpos.x, catpos.y, 2, 2, flipped)
+	--flr rounds down to nearest int
+	--gets item 1-3 from flist
+	--spr(framenum,x,y,framesize,framesize,flipped?)
+	--chair + ball sprites:
+	spr(42, chairx[1], chairy[1], 2, 2)
+	spr(42, chairx[2], chairy[2], 2, 2)
+	spr(42, chairx[3], chairy[3], 2, 2)
+	spr(42, chairx[4], chairy[4], 2, 2, true)
+	spr(44, ballposx[1], ballposy[1], 1, 1)
+	spr(44, ballposx[2], ballposy[2], 1, 1)
 
+	--bottoms of chairs sprites
+	spr(45, bchairx[1], bchairy[1], 2, 2)
+	spr(45, bchairx[2], bchairy[2], 2, 2)
+	spr(45, bchairx[3], bchairy[3], 2, 2)
+	spr(45, bchairx[4], bchairy[4], 2, 2, true)
+
+	--cup sprite:
+	spr(cupframe, 90, 10, 1, 1, cupflip)
+	--water sprite:
+	if cupframe == 54 then
+		if cupflip then
+			spr(39, 98, 10, 1, 1, true)
+		else
+			spr(39, 82, 10, 1, 1)
+		end
+	end
+end
 
 --returns true if 2 objs collided
-function collision(
-	x1,y1,w1,h1, --position,width obj1
-	x2,y2,w2,h2) --pos, width obj2
-	
-	local hit=false
-	
+function collision(x1, y1, w1, h1, x2, y2, w2, h2)
+	--position,width obj1
+	--pos, width obj2
+
+	local hit = false
+
 	--collision distance:
-	local coldisx=w1*.5+w2*.5
-	local coldisy=h1*.5+h2*.5
-	
+	local coldisx = w1 * .5 + w2 * .5
+	local coldisy = h1 * .5 + h2 * .5
+
 	--current distances each axis:
-	local curdisx=abs((x1+(w1/2))-(x2+(w2/2)))
-	local curdisy=abs((y1+(h1/2))-(y2+(h2/2)))
-	
-	if curdisx<coldisx and curdisy<coldisy then
-		hit=true
+	local curdisx = abs(x1 + w1 / 2 - x2 + w2 / 2)
+	local curdisy = abs(y1 + h1 / 2 - y2 + h2 / 2)
+
+	if curdisx < coldisx and curdisy < coldisy then
+		hit = true
 	end
-	
+
 	return hit
-	
 end
+
 __gfx__
 00000000000000000000000000000000000000000000000000007700000000000000000000000000000000000000000000000000000000000000000000000000
 00000000000000000000770000000000000000000000000000000700000000000000000000000000000000000000000000000000000000000000000000000000
