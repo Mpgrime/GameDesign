@@ -38,9 +38,9 @@ function _init()
  } 
  --door class / table
  door = {
-	x = {56, 56, 64, 64}, y = {8, 0, 8, 0}, --door locations
-	frame = {89,73,90,74},
-	w = 8, h = 8
+	x={56,56,64,64},y={8,0,8,0}, --door locations
+	frame={89,73,90,74},w=8,h=8,
+	unlocked=false
  }
 	--is the puzzle solved
 	puzSolve = false
@@ -58,7 +58,8 @@ function _update()
  	frame=1
  end
  for i=1,4 do
- 	if collision(cat.x,cat.y,cat.w,cat.h, door.x[i],door.y[i],door.w,door.h) then
+ 	if collision(cat.x,cat.y,cat.w,cat.h, door.x[i],door.y[i],door.w,door.h)
+	and door.unlocked == true then
 		showEnd = true
 	end
 end
@@ -69,7 +70,7 @@ end
 function _draw()
 	if showEnd then
 		cls()
-		print("you win")
+		print("congratulations, you escaped!",3,60)
 	else
 	--clears screen w/ light blue for sky
  	cls(12) 
@@ -100,7 +101,10 @@ function player_ctrl()
  		if i<3 and collision(cat.x,cat.y-1,cat.w,cat.h,
  		ball.x[i],ball.y[i],ball.w,ball.h) then
  			ball.y[i]-=1
- 		end								
+ 		end
+		if collision(cat.x,cat.y,cat.w,cat.h,door.x[i],door.y[i],door.w,door.h) then
+			canmove=false
+		end							
  	end
  	--if col w/ cup
  	if collision(cat.x,cat.y-1,cat.w,cat.h,
@@ -219,10 +223,12 @@ function signswitch()
 	msign.x,msign.y,msign.w,msign.h) then
 		msign.frame=125
 		puzSolve = true
+		door.unlocked = true
 		door.frame = {91,75,92,76}
 	else 
 		puzSolve = false
 		msign.frame = 124
+		door.unlocked = false
 		door.frame = {89,73,90,74}
 	end
 end
