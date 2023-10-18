@@ -38,14 +38,21 @@ function _init()
  } 
  --door class / table
  door = {
-	x={56,56,64,64},y={8,0,8,0}, --door locations
-	frame={89,73,90,74},w=8,h=8,
-	unlocked=false
+	x={56,56,64,64},y={8,0,8,0}, -- positions
+	frame={89,73,90,74},w=8,h=8, -- frames and hitbox
+	unlocked=false -- open or not
+ }
+ --stage class
+ stage = {
+	map = {}, 
+	props = {}
+
  }
 	--is the puzzle solved
 	puzSolve = false
 	--showEnd
 	showEnd = false
+	stage = 0
 end
 
 function _update()
@@ -60,7 +67,7 @@ function _update()
  for i=1,4 do
  	if collision(cat.x,cat.y,cat.w,cat.h, door.x[i],door.y[i],door.w,door.h)
 	and door.unlocked == true then
-		showEnd = true
+		stage = 1
 	end
 end
  player_ctrl()
@@ -68,18 +75,13 @@ end
 end
 
 function _draw()
-	if showEnd then
-		cls()
-		print("congratulations, you escaped!",3,60)
-	else
-	--clears screen w/ light blue for sky
- 	cls(12) 
+	
+	cls(12) 
  	map(0,0,0,0,16,16) --draws map
  	player_draw()
  	props_draw()
-	end
-end
 
+end
 -->8
 --[update tab]
 
