@@ -5,7 +5,38 @@ __lua__
 --cat game
 --by xan weatherholtz, matthew grimelli, malik hill, marjon ward
 
+--global variable
+flist = {0,0,0}
+
 function _init()
+ title_init()
+end
+
+
+function _update()
+  
+end
+
+
+function _draw()
+
+end
+-->8
+--[init tab]
+
+--start for title screen
+function title_init()
+	--states
+	_update = title_update
+	_draw = title_draw
+end
+
+--start of room1 gameplay
+function game_init()
+	--set state
+	_update = game_update
+	_draw = map_draw
+
  frame=1
  pose=7 --frame when still
 	
@@ -42,21 +73,40 @@ function _init()
 	frame={89,73,90,74},w=8,h=8, -- frames and hitbox
 	unlocked=false -- open or not
  }
- --stage class
- stage = {
-	map = {}, 
-	props = {}
-
+ 
+  --level class/table (currently unused, but will probably be useful)
+ level={"house","forest","factory"}
+ 
+  --house class/table
+ house={
+	  rx={0,32,16,48,16,48}, --x-pos for rooms/screen house level (remember it uses top-left corner)
+	  ry={0,0,0,0,16,16}, --y-pos for rooms/screen of house level
+	  props={}
  }
+ 
+ --unused classes for future levels
+ forest={}
+ facotry={}
 	--is the puzzle solved
 	puzSolve = false
 	--showEnd
 	showEnd = false
 	stage = 0
+	
+end
+-->8
+--[update tab]
+
+--when on title screen
+function title_update()
+	if btnp(❎) then
+		game_init()
+	end
 end
 
-function _update()
- flist={pose,pose,pose} --if no buttons pressed, canmove=true
+--when in room gameplay
+function game_update()
+	flist={pose,pose,pose} --if no buttons pressed, canmove=true
 
 	--frame change
  if frame<3.9 then
@@ -67,23 +117,14 @@ function _update()
  for i=1,4 do
  	if collision(cat.x,cat.y,cat.w,cat.h, door.x[i],door.y[i],door.w,door.h)
 	and door.unlocked == true then
-		stage = 1
+		cat.x=312
+		cat.y=111
 	end
 end
  player_ctrl()
- signswitch() 
+ stage_check(cat,house)
+ signswitch()
 end
-
-function _draw()
-	
-	cls(12) 
- 	map(0,0,0,0,16,16) --draws map
- 	player_draw()
- 	props_draw()
-
-end
--->8
---[update tab]
 
 function player_ctrl()
 --arrow controls
@@ -96,9 +137,9 @@ function player_ctrl()
  			canmove=false
  		end
 		--if col w/ mapedge, can't move:
-		if cat.y-1 < 3 then
-			canmove = false
-		end
+		--if cat.y-1 < 3 then
+		--	canmove = false
+		--end
  		--if col w/ ball, ball moves:
  		if i<3 and collision(cat.x,cat.y-1,cat.w,cat.h,
  		ball.x[i],ball.y[i],ball.w,ball.h) then
@@ -131,9 +172,9 @@ function player_ctrl()
  			canmove=false
  		end
 		--if col w/ mapedge, can't move:
-		if cat.y + 1 > 115 then
-			canmove = false
-		end
+		--if cat.y + 1 > 115 then
+		--	canmove = false
+		--end
  		--if col w/ ball, ball moves:
  		if i<3 and collision(cat.x,cat.y+1,cat.w,cat.h,
  		ball.x[i],ball.y[i],ball.w,ball.h) then
@@ -160,9 +201,9 @@ function player_ctrl()
  			canmove=false
  		end
 		-- if col w/ mapedge, can't move:
-		if cat.x - 1 < 0 then
-			canmove = false
-		end
+		--if cat.x - 1 < 0 then
+		--	canmove = false
+		--end
  		--if col w/ ball, ball moves:
  		if i<3 and collision(cat.x-1,cat.y,cat.w,cat.h,
  		ball.x[i],ball.y[i],ball.w,ball.h) then
@@ -192,9 +233,9 @@ function player_ctrl()
  			canmove=false
  		end
 		--if col w/map edge, can't move:
-		if cat.x + 1 == 115 then
-			canmove = false
-		end
+		--if cat.x + 1 == 115 then
+		--	canmove = false
+		--end
  		--if col w/ ball, ball moves:
  		if i<3 and collision(cat.x+1,cat.y,cat.w,cat.h,
  		ball.x[i],ball.y[i],ball.w,ball.h) then
@@ -217,6 +258,41 @@ function player_ctrl()
  	pose=1
  	cat.flipped=true --backwards ⬅️ sprite
  end
+end
+
+--by inputting the player(cat) and the stage,
+--this function checks which screen/room the player is at.
+function stage_check(p,s)
+	local playertilex=flr(p.x/128)*16
+	local playertiley=flr(p.y/128)*16
+	local screen = 0
+	
+	if (playertilex==s.rx[1])
+	and (playertiley==s.ry[1]) then
+		screen = 1 --starting room
+	end
+	if (playertilex==s.rx[2])
+	and (playertiley==s.ry[2]) then
+		screen = 2 --central room
+	end
+	if (playertilex==s.rx[3])
+	and (playertiley==s.ry[3]) then
+		screen = 3 --leftmost room
+	end
+	if (playertilex==s.rx[4])
+	and (playertiley==s.ry[4]) then
+		screen = 4 --rightmost room
+	end
+	if (playertilex==s.rx[5])
+	and (playertiley==s.ry[5]) then
+		screen = 5 --down from room3
+	end
+	if (playertilex==s.rx[6])
+	and (playertiley==s.ry[6]) then
+		screen = 6 --down from room4
+	end
+		
+	return screen
 end
 
 --sign turns green when red ball touches it
@@ -260,6 +336,21 @@ end
 -->8
 --[draw tab]
 
+--draws title screen stuff
+function title_draw()
+	cls()
+	print("press x to start", 30, 60)
+end
+
+--draws first room map
+function map_draw()
+	cls(12) 
+ map(0,0,0,0,128,64) --draws map
+ room_cam(cat)
+ player_draw()
+ props_draw()
+end
+
 function player_draw()
 --🐱 cat sprite:
  spr(flist[flr(frame)],cat.x,cat.y,cat.size,cat.size,cat.flipped)
@@ -300,6 +391,14 @@ function props_draw()
  spr(door.frame[4],door.x[4],door.y[4])
  --magic sign
  spr(msign.frame,msign.x,msign.y,msign.size,msign.size)
+end
+
+--changes the camera to whichever screen/room...
+--the player is moving towards to.
+function room_cam(p)
+	local mapx=flr(p.x/128)*16
+	local mapy=flr(p.y/128)*16
+	camera(mapx*8,mapy*8)
 end
 __gfx__
 000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000f0000f00000000000000000000000000000
