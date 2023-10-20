@@ -5,58 +5,36 @@ __lua__
 --cat game
 --by xan weatherholtz, matthew grimelli, malik hill, marjon ward
 
+--global variable
+flist = {0,0,0}
+
 function _init()
- frame=1
- pose=7 --frame when still
-	
- --player cat class/table
- cat={
-	x=56,y=56,w=14,h=14, --position(x,y), width, height
- 	size=2,flipped=false --sprite size, flipping the sprite
- }
- 
- --chair class/table
- chair={
- 	x={40,80,30,10},y={70,90,20,100}, --chair locations
- 	bx={40,80,30,10},by={78,98,28,108}, --chair bottom locations
- 	w=14,h=16,bw=14,bh=7 --chair/chair bottom width/height
- }
-
-	--magic_sign class/table
- msign={
-	x=100,y=56,w=8,h=8,
-	size=1,frame=124
- }
-	
- --ball class/table
- ball={x={60,20},y={80,40},w=6,h=6}
- 
- --cup class/table
- cup={
-	x=90,y=10,w=8,h=8,
- 	size=1,frame=38,flipped=false --flip=true if reflected
- } 
- --door class / table
- door = {
-	x={56,56,64,64},y={8,0,8,0}, -- positions
-	frame={89,73,90,74},w=8,h=8, -- frames and hitbox
-	unlocked=false -- open or not
- }
- --stage class
- stage = {
-	map = {}, 
-	props = {}
-
- }
-	--is the puzzle solved
-	puzSolve = false
-	--showEnd
-	showEnd = false
-	stage = 0
+ title_init()
 end
 
+
 function _update()
- flist={pose,pose,pose} --if no buttons pressed, canmove=true
+  
+end
+
+
+function _draw()
+
+end
+
+-->8
+--[update tab]
+
+--when on title screen
+function title_update()
+	if btnp(❎) then
+		game_init()
+	end
+end
+
+--when in room gameplay
+function game_update()
+	flist={pose,pose,pose} --if no buttons pressed, canmove=true
 
 	--frame change
  if frame<3.9 then
@@ -71,19 +49,8 @@ function _update()
 	end
 end
  player_ctrl()
- signswitch() 
+ signswitch()
 end
-
-function _draw()
-	
-	cls(12) 
- 	map(0,0,0,0,16,16) --draws map
- 	player_draw()
- 	props_draw()
-
-end
--->8
---[update tab]
 
 function player_ctrl()
 --arrow controls
@@ -260,6 +227,20 @@ end
 -->8
 --[draw tab]
 
+--draws title screen stuff
+function title_draw()
+	cls()
+	print("press x to start", 30, 60)
+end
+
+--draws first room map
+function map_draw()
+	cls(12) 
+ map(0,0,0,0,16,16) --draws map
+ player_draw()
+ props_draw()
+end
+
 function player_draw()
 --🐱 cat sprite:
  spr(flist[flr(frame)],cat.x,cat.y,cat.size,cat.size,cat.flipped)
@@ -300,6 +281,71 @@ function props_draw()
  spr(door.frame[4],door.x[4],door.y[4])
  --magic sign
  spr(msign.frame,msign.x,msign.y,msign.size,msign.size)
+end
+-->8
+--[init tab]
+
+--start for title screen
+function title_init()
+	--states
+	_update = title_update
+	_draw = title_draw
+end
+
+--start of room1 gameplay
+function game_init()
+	--set state
+	_update = game_update
+	_draw = map_draw
+
+ frame=1
+ pose=7 --frame when still
+	
+ --player cat class/table
+ cat={
+	x=56,y=56,w=14,h=14, --position(x,y), width, height
+ 	size=2,flipped=false --sprite size, flipping the sprite
+ }
+ 
+ --chair class/table
+ chair={
+ 	x={40,80,30,10},y={70,90,20,100}, --chair locations
+ 	bx={40,80,30,10},by={78,98,28,108}, --chair bottom locations
+ 	w=14,h=16,bw=14,bh=7 --chair/chair bottom width/height
+ }
+
+	--magic_sign class/table
+ msign={
+	x=100,y=56,w=8,h=8,
+	size=1,frame=124
+ }
+	
+ --ball class/table
+ ball={x={60,20},y={80,40},w=6,h=6}
+ 
+ --cup class/table
+ cup={
+	x=90,y=10,w=8,h=8,
+ 	size=1,frame=38,flipped=false --flip=true if reflected
+ } 
+ --door class / table
+ door = {
+	x={56,56,64,64},y={8,0,8,0}, -- positions
+	frame={89,73,90,74},w=8,h=8, -- frames and hitbox
+	unlocked=false -- open or not
+ }
+ --stage class
+ stage = {
+	map = {}, 
+	props = {}
+
+ }
+	--is the puzzle solved
+	puzSolve = false
+	--showEnd
+	showEnd = false
+	stage = 0
+	
 end
 __gfx__
 000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000f0000f00000000000000000000000000000
