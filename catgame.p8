@@ -370,24 +370,25 @@ function mapCollision(obj, dir)
 	local cT = false --is colliding top
 
 	-- get coords of object
-	local x = (obj.x/8)
-	local y = (obj.y/8)
-
+	local x1 = ((obj.x+7)/8)
+	local y1 = ((obj.y+7)/8)
+	local x2 = ((obj.x+15)/8)
+	local y2 = ((obj.y+15)/8)
 	-- check if colliding left
-	if dir == "l" then
-		cL = fget(mget(x-1, y), 0) --checks if tile left has flag 0 set
+	if dir == "l" or dir == "t" then
+		cL = fget(mget(x1, y1), 0) --checks if tile left has flag 0 set
 	end
 	--check if colliding bottom
-	if dir =="b" then
-		cB = fget(mget(x, y+1), 0) --checks if tile below has flag 0 set
+	if dir =="b" or dir == "l" then
+		cB = fget(mget(x1, y2), 0) --checks if tile below has flag 0 set
 	end
 	--check if colliding right
-	if dir =="r" then
-		cR = fget(mget(x+1, y), 0) --checks if tile right has flag 0 set
+	if dir =="r" or dir == "t" then
+		cR = fget(mget(x2, y1), 0) --checks if tile right has flag 0 set
 	end
 	--check if colliding top
-	if dir =="t" then
-		cT = fget(mget(x, y-1), 0) --checks if tile top has flag 0 set
+	if dir =="t" or dir == "b" then
+		cT = fget(mget(x2, y2), 0) --checks if tile top has flag 0 set
 	end
 	if cT or cR or cB or cL then --if there will be a collision
 		return true
@@ -420,6 +421,8 @@ function map_draw()
 	props_draw()
 	print(cat.x)
 	print(cat.y)
+	print(chair.x[1])
+	print(chair.y[1])
 	
 end
 
