@@ -341,12 +341,12 @@ function objCollision(x1, y1, w1, h1, x2, y2, w2, h2)
 	local hit = false
 
 	--collision distance:
-	local coldisx = w1 * .5 + w2 * .5
-	local coldisy = h1 * .5 + h2 * .5
+	local coldisx = (w1 * .5) + (w2 * .5)
+	local coldisy = (h1 * .5) + (h2 * .5)
 
 	--current distances each axis:
-	local curdisx = abs(x1 + w1 / 2 - x2 + w2 / 2)
-	local curdisy = abs(y1 + h1 / 2 - y2 + h2 / 2)
+	local curdisx = abs((x1 + (w1 / 2)) - (x2 + (w2 / 2)))
+	local curdisy = abs((y1 + (h1 / 2)) - (y2 + (h2 / 2)))
 
 	if curdisx < coldisx and curdisy < coldisy then
 		hit = true
@@ -400,11 +400,6 @@ function map_draw()
 	room_cam(cat)
 	player_draw()
 	props_draw()
-	print(cat.x)
-	print(cat.y)
-	print(chair.x[1])
-	print(chair.y[1])
-	
 end
 
 function player_draw()
