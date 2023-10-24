@@ -165,7 +165,7 @@ function player_ctrl()
 		end
 		--pos change if able:
 		if canmove then cat.y -= 1 end
-		if mapCollision(cat,'t') then cat.y += 1 end
+		if mapCollision(cat) then cat.y += 1 end
 		--frame set change
 		flist = { 32, 34, 36 }
 		--pose change
@@ -200,7 +200,7 @@ function player_ctrl()
 		end
 		--pos change if able:
 		if canmove then cat.y += 1 end
-		if mapCollision(cat,'t') then cat.y -= 1 end
+		if mapCollision(cat) then cat.y -= 1 end
 		flist = { 7, 9, 11 }
 		pose = 7
 		cat.flipped = false
@@ -236,7 +236,7 @@ function player_ctrl()
 		end
 		--pos change if able:
 		if canmove then cat.x -= 1 end
-		if mapCollision(cat,'t') then cat.x += 1 end
+		if mapCollision(cat) then cat.x += 1 end
 		flist = { 1, 3, 5 }
 		pose = 1
 		cat.flipped = false
@@ -273,7 +273,7 @@ function player_ctrl()
 		end
 		--pos change if able:
 		if canmove then cat.x += 1 end
-		if mapCollision(cat,'t') then cat.x -= 1 end
+		if mapCollision(cat) then cat.x -= 1 end
 		--catpos.x+=1
 		flist = { 1, 3, 5 }
 		pose = 1
@@ -362,11 +362,11 @@ function mapCollision(obj)
 	local a = false --is colliding top
 
 	-- get coords of object
-	local x1 = (obj.x+7)/8 --
-	local y1 = (obj.y+15)/8
-	local x2 = (obj.x+23)/8
-	local y2 = (obj.y+23)/8
-	d = fget(mget(x1, y1), 0)
+	local x1 = (obj.x+7)/8 --left bound
+	local y1 = (obj.y+15)/8 --top bound
+	local x2 = (obj.x+23)/8 --right bound
+	local y2 = (obj.y+23)/8 --bottom bound
+	d = fget(mget(x1, y1), 0) --check if the next tile has flag 0 set
 	c = fget(mget(x1, y2), 0)
 	b = fget(mget(x2, y1), 0)
 	a = fget(mget(x2, y2), 0) 
