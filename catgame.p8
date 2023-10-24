@@ -137,9 +137,6 @@ function player_ctrl()
 	--arrow controls
 	if btn(⬆️) then
 		local canmove = true
-		if mapCollision(cat,'t') then
-			canmove = false
-		end
 		for i = 1, 4 do
 			--if col w/ bchair, can't move:
 			if objCollision(
@@ -168,6 +165,7 @@ function player_ctrl()
 		end
 		--pos change if able:
 		if canmove then cat.y -= 1 end
+		if mapCollision(cat,'t') then cat.y += 1 end
 		--frame set change
 		flist = { 32, 34, 36 }
 		--pose change
@@ -177,9 +175,6 @@ function player_ctrl()
 	end
 	if btn(⬇️) then
 		local canmove = true
-		if mapCollision(cat,'b') then
-			canmove = false
-		end
 		for i = 1, 4 do
 			--if col w/ bchair, can't move:
 			if objCollision(
@@ -205,15 +200,13 @@ function player_ctrl()
 		end
 		--pos change if able:
 		if canmove then cat.y += 1 end
+		if mapCollision(cat,'t') then cat.y -= 1 end
 		flist = { 7, 9, 11 }
 		pose = 7
 		cat.flipped = false
 	end
 	if btn(⬅️) then
 		local canmove = true
-		if mapCollision(cat,'l') then
-			canmove = false
-		end
 		for i = 1, 4 do
 			--if col w/ bchair, can't move:
 			if objCollision(
@@ -243,15 +236,13 @@ function player_ctrl()
 		end
 		--pos change if able:
 		if canmove then cat.x -= 1 end
+		if mapCollision(cat,'t') then cat.x += 1 end
 		flist = { 1, 3, 5 }
 		pose = 1
 		cat.flipped = false
 	end
 	if btn(➡️) then
 		local canmove = true
-		if mapCollision(cat,'r') then
-			canmove = false
-		end
 		for i = 1, 4 do
 			--if col w/ bchair, can't move:
 			if objCollision(
@@ -282,6 +273,7 @@ function player_ctrl()
 		end
 		--pos change if able:
 		if canmove then cat.x += 1 end
+		if mapCollision(cat,'t') then cat.x -= 1 end
 		--catpos.x+=1
 		flist = { 1, 3, 5 }
 		pose = 1
@@ -363,34 +355,23 @@ function objCollision(x1, y1, w1, h1, x2, y2, w2, h2)
 	return hit
 end
 --returns true if colliding with edge tile
-function mapCollision(obj, dir)
-	local cL = false --is colliding left
-	local cB = false --is colliding bottom
-	local cR = false --is colliding right
-	local cT = false --is colliding top
+function mapCollision(obj)
+	local d = false --is colliding left
+	local c = false --is colliding bottom
+	local b = false --is colliding right
+	local a = false --is colliding top
 
 	-- get coords of object
-	local x1 = ((obj.x+7)/8)
-	local y1 = ((obj.y+7)/8)
-	local x2 = ((obj.x+15)/8)
-	local y2 = ((obj.y+15)/8)
-	-- check if colliding left
-	if dir == "l" or dir == "t" then
-		cL = fget(mget(x1, y1), 0) --checks if tile left has flag 0 set
-	end
-	--check if colliding bottom
-	if dir =="b" or dir == "l" then
-		cB = fget(mget(x1, y2), 0) --checks if tile below has flag 0 set
-	end
-	--check if colliding right
-	if dir =="r" or dir == "t" then
-		cR = fget(mget(x2, y1), 0) --checks if tile right has flag 0 set
-	end
-	--check if colliding top
-	if dir =="t" or dir == "b" then
-		cT = fget(mget(x2, y2), 0) --checks if tile top has flag 0 set
-	end
-	if cT or cR or cB or cL then --if there will be a collision
+	local x1 = (obj.x+7)/8 --
+	local y1 = (obj.y+15)/8
+	local x2 = (obj.x+23)/8
+	local y2 = (obj.y+23)/8
+	d = fget(mget(x1, y1), 0)
+	c = fget(mget(x1, y2), 0)
+	b = fget(mget(x2, y1), 0)
+	a = fget(mget(x2, y2), 0) 
+
+	if a or b or c or d then --if there will be a collision
 		return true
 	else 
 		return false
@@ -688,7 +669,7 @@ d4444444444444444444444444444444444444444444444444444444444444444444444444444444
 dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd
 
 __gff__
-0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000010000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
+0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000010000000000000000010000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
 0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
 __map__
 5050505050505050505050505050505050505050505050505050505050505050505050505050505050505050505050505050505047474747474747474747474700000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
