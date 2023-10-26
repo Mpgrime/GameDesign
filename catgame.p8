@@ -454,8 +454,8 @@ end
 --note:new cam function still has kinks bc
 --of the spreaded map layout,still needs fixing long-term
 function room_cam(p)
-	local mapx = flr(p.x / 128) * 136
-	local mapy = flr(p.y / 128) * 136
+	local mapx = flr(p.x/128)*(136) 
+	local mapy = flr(p.y/128)*(136)
 	camera(mapx, mapy)
 end
 
