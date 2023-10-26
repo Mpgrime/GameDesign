@@ -316,6 +316,84 @@ function stage_check(p, s)
 	return screen
 end
 
+-- function for button puzzle
+function colorcombo_house(p,b)
+	local solved=false
+	local answer={"r","g","b","y"}
+
+	if collision(p.x,p.y,p.w,p.h,
+	b.x[1],b.y[1],b.w,b.h) and
+	btnp(❎) then
+		b.frame[1]=113
+		add(attempt_h,"r")
+
+		if(count(attempt_h)!=1) then
+			attempt_h = {}
+			reset_buttons(b)
+		end
+	end
+	
+	if collision(p.x,p.y,p.w,p.h,
+	b.x[2],b.y[2],b.w,b.h) and
+	btnp(❎) then
+		b.frame[2]=115
+		add(attempt_h,"g")
+
+		if(count(attempt_h)!=2) then
+			attempt_h = {}
+			reset_buttons(b)
+		end
+	end
+	
+	if collision(p.x,p.y,p.w,p.h,
+	b.x[3],b.y[3],b.w,b.h) and
+	btnp(❎) then
+		b.frame[3]=117
+		add(attempt_h,"b")
+
+		if(count(attempt_h)!=3) then
+			attempt_h = {}
+			reset_buttons(b)
+		end
+	end
+	
+	if collision(p.x,p.y,p.w,p.h,
+	b.x[4],b.y[4],b.w,b.h) and
+	btnp(❎) then
+		b.frame[4]=119
+		add(attempt_h,"y")
+
+		if(count(attempt_h)!=4) then
+			attempt_h = {}
+			reset_buttons(b)
+		end
+	end
+	
+	if count(attempt_h)==4 then
+		solved=true
+	elseif count(attempt_h)>4 then
+		solved=false
+		while count(attempt_h)>0 do
+			deli(attempt_h)
+		end
+	else
+		solved=false
+	end
+	
+	return count(attempt_h) 
+	--supposed to return solved
+	--if player presses colors in
+	--right order 
+end
+
+-- resets all buttons from button puzzle to not being pushed
+function reset_buttons(b)
+	b.frame[1]=112
+	b.frame[2]=114
+	b.frame[3]=116
+	b.frame[4]=118
+end
+
 --sign turns green when red ball touches it
 function signswitch()
 	if objCollision(
