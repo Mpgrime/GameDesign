@@ -165,7 +165,7 @@ function player_ctrl()
 		end
 		--pos change if able:
 		if canmove then cat.y -= 1 end
-	--	if mapCollision(cat) then cat.y += 1 end
+		if mapCollision(cat) then cat.y += 1 end
 		--frame set change
 		flist = { 32, 34, 36 }
 		--pose change
@@ -200,7 +200,7 @@ function player_ctrl()
 		end
 		--pos change if able:
 		if canmove then cat.y += 1 end
-		--if mapCollision(cat) then cat.y -= 1 end
+		if mapCollision(cat) then cat.y -= 1 end
 		flist = { 7, 9, 11 }
 		pose = 7
 		cat.flipped = false
@@ -236,7 +236,7 @@ function player_ctrl()
 		end
 		--pos change if able:
 		if canmove then cat.x -= 1 end
-	 if mapCollision(cat) then cat.x += 1 end
+	 	if mapCollision(cat) then cat.x += 1 end
 		flist = { 1, 3, 5 }
 		pose = 1
 		cat.flipped = false
@@ -273,8 +273,7 @@ function player_ctrl()
 		end
 		--pos change if able:
 		if canmove then cat.x += 1 end
-	--	if mapCollision(cat) then cat.x -= 1 end
-		--catpos.x+=1
+		if mapCollision(cat) then cat.x -= 1 end
 		flist = { 1, 3, 5 }
 		pose = 1
 		cat.flipped = true --backwards ⬅️ sprite
