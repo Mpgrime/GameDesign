@@ -50,8 +50,8 @@ function game_init()
 
 	--chair class/table
 	chair = {
-		x={40, 80, 30, 10}, y={70, 90, 20, 100}, --chair locations
-		bx={40, 80, 30, 10}, by={78, 98, 28, 108}, --chair bottom locations
+		x={232, 80, 30, 135}, y={107, 90, 20, 74}, --chair locations
+		bx={232, 80, 30, 135}, by={115, 98, 28, 82}, --chair bottom locations
 		w=14, h=16, bw=14, bh=7 --chair/chair bottom width/height
 	}
 
@@ -66,7 +66,7 @@ function game_init()
 
 	--cup class/table
 	cup = {
-		x=90,y=10,w=8,h=8,
+		x=224,y=26,w=8,h=8,
 		size=1,frame=38,flipped=false --flip=true if reflected
 	}
 	
@@ -512,7 +512,8 @@ function title_draw()
 	map(1, 18, 0, 0, 128, 64)
 	print("furball productions presents", 9, 20, 6)
 	print("protect your catsle", 26, 55, 1)
-	print("press x to start", 32, 110, 6)
+	print("press x to start", 32, 102, 10)
+	print("arrows - move, x to interact",8,118,6)
 	spr(flist[flr(frame)], 55, 75, 2, 2)
 	--cat sprite
 end
@@ -526,8 +527,6 @@ function map_draw()
 	interact_draw()
 	player_draw()
 	props_draw()
-	print(cat.x,cat.x,cat.y,12)
-	print(cat.y,cat.x+12,cat.y,9)
 	
 	if showend==true then
 		cls()
@@ -563,9 +562,9 @@ function props_draw()
 	--water sprite:
 	if cup.frame == 54 then
 		if cup.flipped then
-			spr(39,98,10,1,1,true)
+			spr(39,232,26,1,1,true)
 		else
-			spr(39,82,10,1,1)
+			spr(39,216,26,1,1)
 		end
 	end
 	--door
