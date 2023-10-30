@@ -28,7 +28,7 @@ function title_init()
 
 	--cat animation stuff
 	frame = 1
-	flist = { 1, 3, 5 }
+	flist = {1, 3, 5}
 end
 
 --start of room1 gameplay
@@ -44,25 +44,27 @@ function game_init()
 	--player cat class/table
 	cat = {
 		x=56, y=56, w=14, h=14, --position(x,y), width, height
-		size=2, flipped=false --sprite size, flipping the sprite
-		, collision=true
+		size=2, flipped=false, --sprite size, flipping the sprite
+		collision=true
 	}
 
 	--chair class/table
 	chair = {
-		x={232, 80, 150, 135}, y={107, 90, 20, 74}, --chair locations
-		bx={232, 80, 150, 135}, by={115, 98, 28, 82}, --chair bottom locations
-		w=14, h=16, bw=14, bh=7 --chair/chair bottom width/height
+		x={488,456,150,232,400,140},y={107,59,20,102,22,232}, --chair locations
+		bx={488,456,150,232,400,140},by={115,67,28,110,30,240}, --chair bottom locations
+		w=14,h=16,bw=14,bh=7,frame=42 --chair/chair bottom width/height
 	}
 
 	--magic_sign class/table
 	msign = {
-		x=100,y=56,w=8,h=8,
-		size=1,frame=13
+		x={24,96},y={36,36},w=8,h=8,
+		size=1,frame={29,13}
 	}
 
 	--ball class/table
-	ball = {x={60,28},y={80,40},w=6,h=6}
+	ball = {
+	x={88,32},y={88,88},w=6,h=6
+	}
 
 	--cup class/table
 	cup = {
@@ -70,11 +72,14 @@ function game_init()
 		size=1,frame=38,flipped=false --flip=true if reflected
 	}
 	
+	--puzzle buttons (house)
 	pushbtn={
-		x={268,268,364,364},y={47,22,47,22},
-		w=8,h=8,size=1,frame={112,114,116,118}
+		x={268,268,364,364,60},y={47,22,47,22,36},
+		w=8,h=8,size=1,
+		frame={112,114,116,118,120}
 	}
 	
+	--attempt for house puzzle
 	attempt_h={}
 	
 	--door class/table
@@ -137,8 +142,9 @@ function game_update()
 		frame = 1
 	end
 	for i = 1, 4 do
-		if objcollision(cat.x, cat.y, cat.w, cat.h, door.x[i], door.y[i], door.w, door.h)
-				and door.unlocked == true then
+		if objcollision(cat.x, cat.y, cat.w, cat.h,
+		door.x[i], door.y[i], door.w, door.h)
+		and door.unlocked == true then
 			cat.x = 312
 			cat.y = 100
 		end
@@ -146,7 +152,7 @@ function game_update()
 	 
 	player_ctrl()
 	stage_check(cat,house)
-	signswitch()
+	housesigns(ball,msign,door)
 	colorcombo_house(cat,pushbtn)
 	
 	if colorcombo_house(cat,pushbtn) then
@@ -168,22 +174,19 @@ function player_ctrl()
 	--arrow controls
 	if btn(⬆️) then
 		local canmove = true
-		for i = 1, 4 do
+		for i = 1,6 do
 			--if col w/ bchair, can't move:
-			if objcollision(
-				cat.x, cat.y - 1, cat.w, cat.h,
-				chair.bx[i], chair.by[i], chair.w, chair.h
-			) then
+			if objcollision(cat.x,cat.y - 1,cat.w,cat.h,
+			chair.bx[i], chair.by[i], chair.w, chair.h) then
 				canmove = false
 			end
 			--if col w/ ball, ball moves:
-			if i < 3 and objcollision(
-				cat.x, cat.y - 1, cat.w, cat.h,
-				ball.x[i], ball.y[i], ball.w, ball.h
-			) then
+			if i<3 and objcollision(cat.x,cat.y - 1,cat.w,cat.h,
+			ball.x[i], ball.y[i], ball.w, ball.h) then
 				ball.y[i] -= 1
 			end
-			if objcollision(cat.x, cat.y, cat.w, cat.h, door.x[i], door.y[i], door.w, door.h) then
+			if i<4 and objcollision(cat.x, cat.y, cat.w, cat.h,
+			door.x[i], door.y[i], door.w, door.h) then
 				canmove = false
 			end
 		end
@@ -206,7 +209,7 @@ function player_ctrl()
 	end
 	if btn(⬇️) then
 		local canmove = true
-		for i = 1, 4 do
+		for i = 1,6 do
 			--if col w/ bchair, can't move:
 			if objcollision(
 				cat.x, cat.y + 1, cat.w, cat.h,
@@ -215,11 +218,11 @@ function player_ctrl()
 				canmove = false
 			end
 			--if col w/ ball, ball moves:
-			if i < 3 and objcollision(
-				cat.x, cat.y + 1, cat.w, cat.h,
+			if i<3 and objcollision(
+				cat.x, cat.y+1, cat.w, cat.h,
 				ball.x[i], ball.y[i], ball.w, ball.h
 			) then
-				ball.y[i] += 1
+				ball.y[i]+=1
 			end
 		end
 		--if col w/ cup
@@ -232,13 +235,13 @@ function player_ctrl()
 		--pos change if able:
 		if canmove then cat.y += 1 end
 		if mapCollision(cat) then cat.y -= 1 end
-		flist = { 7, 9, 11 }
+		flist = {7, 9, 11}
 		pose = 7
 		cat.flipped = false
 	end
 	if btn(⬅️) then
 		local canmove = true
-		for i = 1, 4 do
+		for i = 1,6 do
 			--if col w/ bchair, can't move:
 			if objcollision(
 				cat.x - 1, cat.y, cat.w, cat.h,
@@ -268,18 +271,16 @@ function player_ctrl()
 		--pos change if able:
 		if canmove then cat.x -= 1 end
 	 if mapCollision(cat) then cat.x += 1 end
-		flist = { 1, 3, 5 }
+		flist = {1, 3, 5}
 		pose = 1
 		cat.flipped = false
 	end
 	if btn(➡️) then
 		local canmove = true
-		for i = 1, 4 do
+		for i=1,6 do
 			--if col w/ bchair, can't move:
-			if objcollision(
-				cat.x + 1, cat.y, cat.w, cat.h,
-				chair.bx[i], chair.by[i], chair.bw, chair.bh
-			) then
+			if objcollision(cat.x + 1,cat.y,cat.w,cat.h,
+			chair.bx[i],chair.by[i],chair.bw,chair.bh) then
 				canmove = false
 			end
 			--if col w/ ball, ball moves:
@@ -291,10 +292,8 @@ function player_ctrl()
 			end
 		end
 		--if col w/ cup, change cup
-		if objcollision(
-			cat.x + 1, cat.y, cat.w, cat.h,
-			cup.x, cup.y, cup.w, cup.h
-		) then
+		if objcollision(cat.x+1,cat.y,cat.w,cat.h,
+		cup.x,cup.y,cup.w,cup.h) then
 			canmove = false
 			if cup.frame == 38 then
 				--if not already changed
@@ -303,16 +302,17 @@ function player_ctrl()
 			end
 		end
 		--pos change if able:
-		if canmove then cat.x += 1 end
-		if mapCollision(cat) then cat.x -= 1 end
-		flist = { 1, 3, 5 }
+		if canmove then cat.x+=1 end
+		if mapCollision(cat) then cat.x-=1 end
+		flist = {1, 3, 5}
 		pose = 1
 		cat.flipped = true --backwards ⬅️ sprite
 	end
 end
-
---by inputting the player(cat) and the stage,
---this function checks which screen/room the player is at.
+ 
+--[[by inputting the player(cat)
+and the stage,this function checks
+which screen/room the player is at.]]
 function stage_check(p, s)
 	local playertilex = flr(p.x / 128) * 17
 	local playertiley = flr(p.y / 128) * 17
@@ -356,7 +356,6 @@ function colorcombo_house(p,b)
 	btnp(❎) then
 		b.frame[1]=113
 		add(attempt_h,"r")
-
 		if(count(attempt_h)!=1) then
 			deli(attempt_h)
 		 reset_buttons(b)
@@ -368,7 +367,6 @@ function colorcombo_house(p,b)
 	btnp(❎) then
 		b.frame[2]=115
 		add(attempt_h,"g")
-
 		if(count(attempt_h)!=2) then
 			deli(attempt_h)
 		 reset_buttons(b)
@@ -380,7 +378,6 @@ function colorcombo_house(p,b)
 	btnp(❎) then
 		b.frame[3]=117
 		add(attempt_h,"b")
-
 		if(count(attempt_h)!=3) then
 			deli(attempt_h)
 			reset_buttons(b)
@@ -392,7 +389,6 @@ function colorcombo_house(p,b)
 	btnp(❎) then
 		b.frame[4]=119
 		add(attempt_h,"y")
-
 		if(count(attempt_h)!=4) then
 		 deli(attempt_h)
 			reset_buttons(b)
@@ -415,7 +411,8 @@ function colorcombo_house(p,b)
 	return solved 
 end
 
--- resets all buttons from button puzzle to not being pushed
+--[[resets all buttons from button
+puzzle to not being pushed]]
 function reset_buttons(b)
 	b.frame[1]=112
 	b.frame[2]=114
@@ -429,32 +426,58 @@ function cprtables(t1,t2)
 	local b=false
 	local c=false
 	local d=false
-	local same=false
+	local match=false
 	
 	if t1[1]==t2[1] then a=true end
 	if t1[2]==t2[2] then b=true end
 	if t1[3]==t2[3] then c=true end
 	if t1[4]==t2[4] then d=true end
-	if a and b and c and d then same=true end
+	if a and b and c and d then match=true end
 	
-	return same
+	return match
 end
 
---sign turns green when red ball touches it
-function signswitch()
-	if objcollision(
-		ball.x[2], ball.y[2], ball.w, ball.h,
-		msign.x, msign.y, msign.w, msign.h
-	) then
-		msign.frame = 14
-		puzSolve = true
-		door.unlocked = true
-		door.frame = {91, 75, 92, 76}
+--[[magic sign puzzle:
+signs turn green when correct
+ball is placed]]
+function housesigns(b,m,d)
+	local sign1=false
+	local sign2=false
+	
+	if objcollision(b.x[1],b.y[1],b.w,b.h,
+	m.x[1],m.y[1],m.w,m.h) then
+		sign1=true
+		m.frame[1]=30
 	else
-		puzSolve = false
-		msign.frame = 13
-		door.unlocked = false
-		door.frame = {89, 73, 90, 74}
+		sign1=false
+		m.frame[1]=29
+	end
+	if objcollision(b.x[2],b.y[2],b.w,b.h,
+	m.x[2],m.y[2],m.w,m.h) then
+		sign2=true
+		m.frame[2]=14
+	else
+		sign2=false
+		m.frame[2]=13
+	end
+	
+	if objcollision(cat.x,cat.y,cat.w,cat.h,
+	pushbtn.x[5],pushbtn.y[5],pushbtn.w,pushbtn.h) and
+	btnp(❎) then
+		--[[resets balls when button is pressed.
+		meant to make a function for this]]
+		b.x[1]=88
+		b.y[1]=88
+		b.x[2]=32
+		b.y[2]=88
+	end
+	
+	if sign1 and sign2 then
+		d.unlocked = true
+		d.frame = {91,75,92,76}
+	else
+		d.unlocked = false
+		d.frame = {89,73,90,74}
 	end
 end
 
@@ -512,8 +535,8 @@ function title_draw()
 	map(1, 18, 0, 0, 128, 64)
 	print("furball productions presents", 9, 20, 6)
 	print("protect your catsle", 26, 55, 1)
-	print("press x to start", 32, 102, 10)
-	print("arrows - move, x to interact",8,118,6)
+	print("press ❎ to start", 32, 102, 10)
+	print("⬆️⬇️⬅️➡️ - move, ❎ - interact",4.5,118,6)
 	spr(flist[flr(frame)], 55, 75, 2, 2)
 	--cat sprite
 end
@@ -527,7 +550,6 @@ function map_draw()
 	interact_draw()
 	player_draw()
 	props_draw()
-	
 	if showend==true then
 		cls()
 		print("you escaped the house!",275,56)
@@ -543,14 +565,18 @@ function player_draw()
 end
 
 function props_draw()
-	--chair + ball sprites:
-	spr(42, chair.x[1], chair.y[1], 2, 2)
-	spr(42, chair.x[2], chair.y[2], 2, 2)
-	spr(42, chair.x[3], chair.y[3], 2, 2)
-	spr(42, chair.x[4], chair.y[4], 2, 2, true)
+	--chairs in blue room
+	spr(chair.frame,chair.x[3],chair.y[3],2,2)
+	spr(chair.frame,chair.x[4],chair.y[4],2,2,true)
+	--chairs in yellow room
+	spr(chair.frame,chair.x[1],chair.y[1],2,2)
+	spr(chair.frame,chair.x[2],chair.y[2],2,2)
+	spr(chair.frame,chair.x[5],chair.y[5],2,2,true)
+	--chair in green room
+	spr(chair.frame,chair.x[6],chair.y[6],2,2)
+	--balls
 	spr(44, ball.x[1], ball.y[1], 1, 1)
 	spr(60, ball.x[2], ball.y[2], 1, 1)
-
 	--bottoms of chairs sprites
 	spr(45, chair.bx[1], chair.by[1], 2, 2)
 	spr(45, chair.bx[2], chair.by[2], 2, 2)
@@ -567,31 +593,32 @@ function props_draw()
 			spr(39,216,26,1,1)
 		end
 	end
+end
+
+function interact_draw()
 	--door
 	spr(door.frame[1], door.x[1], door.y[1])
 	spr(door.frame[2], door.x[2], door.y[2])
 	spr(door.frame[3], door.x[3], door.y[3])
 	spr(door.frame[4], door.x[4], door.y[4])
+	--puzzle door
 	spr(door2.frame[1],door2.x[1],door2.y[1])
 	spr(door2.frame[2],door2.x[2],door2.y[2])
 	spr(door2.frame[3],door2.x[3],door2.y[3])
 	spr(door2.frame[4],door2.x[4],door2.y[4])
-end
-
-function interact_draw()
 	--magic sign
-	spr(msign.frame, msign.x, msign.y, msign.size, msign.size)
+	spr(msign.frame[1],msign.x[1],msign.y[1], msign.size, msign.size)
+	spr(msign.frame[2],msign.x[2],msign.y[2],msign.size,msign.size)
 	--buttons
 	spr(pushbtn.frame[1],pushbtn.x[1],pushbtn.y[1],pushbtn.size,pushbtn.size)
 	spr(pushbtn.frame[2],pushbtn.x[2],pushbtn.y[2],pushbtn.size,pushbtn.size)
 	spr(pushbtn.frame[3],pushbtn.x[3],pushbtn.y[3],pushbtn.size,pushbtn.size)
 	spr(pushbtn.frame[4],pushbtn.x[4],pushbtn.y[4],pushbtn.size,pushbtn.size)
+	spr(pushbtn.frame[5],pushbtn.x[5],pushbtn.y[5],pushbtn.size,pushbtn.size)
 end
+
 --changes the camera to whichever screen/room...
 --the player is moving towards to.
-
---note:new cam function still has kinks bc
---of the spreaded map layout,still needs fixing long-term 59.5
 function room_cam(p)
 	local mapx = flr(p.x/128)*16 
 	local mapy = flr(p.y/128)*16
@@ -601,35 +628,35 @@ end
 __gfx__
 000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000f0000f000000088880000bbbb0000000000
 00000000000000000000000000000000000000000f0000f00000000000000f0000f00000000000000000000000000ff77ff00000080000800b0000b000000000
-007007000f0000f00000000000000000000000000ff77ff000000f0000000ff77ff0000000000f0000f0000000000ff77ff0000080800808b0b00b0b00000000
-000770000ff77ff000000f000f0000f0000000000f77fff00000f0f000000ff77ff0000000000ff77ff0000000000fa77af0000080888808b0bbbb0b00000000
-000770000f77fff00000f0f00ff77ff0000000000a7afff00000007000000fa77af0000000000ff77ff00000000007f77f70000080888808b0bbbb0b00000000
-007007000a7afff0000000700f77fff00000ff000f777ff100000770000007f77f70000000000fa77af00000000000777700000080088008b00bb00b00000000
+007007000f0000f00000000000000000000000000ff77ff000000f0000000ff77ff0000000000f0000f0000000000ff77ff0000080000008b000000b00000000
+000770000ff77ff000000f000f0000f0000000000f77fff00000f0f000000ff77ff0000000000ff77ff0000000000fa77af0000088888888bbbbbbbb00000000
+000770000f77fff00000f0f00ff77ff0000000000a7afff00000007000000fa77af0000000000ff77ff00000000007f77f70000088888888bbbbbbbb00000000
+007007000a7afff0000000700f77fff00000ff000f777ff100000770000007f77f70000000000fa77af00000000000777700000080000008b000000b00000000
 000000000f777ff1000007700a7afff0000f00700777771fffff77700000007777000000000007f77f7000000000001111000000080000800b0000b000000000
 000000000777771fffff77700f777ff10000077000111177fff777000000001111000000000000777700000000000ff77ff000000088880000bbbb0000000000
-0000000000111177fff777000777771fffff7770000777777f77700000000ff77ff00000000000111100000000000f7777f00000000000000000000000000000
-00000000000777777f77700000111177fff77700000777777777700000000f7777f0000000000ff77ff000000000077777700000000000000000000000000000
-000000000007777777777000000777777f7770000007777777777700000007777770000000000f7777f000000000077777700000000000000000000000000000
-0000000000077777777777000007777777777700000ff0ff07f07f000000077777700000000007777770000000000ff00ff00000000000000000000000000000
-00000000000f707f077077000007777777777700000000000000000000000f7007f0000000000777777000000000000000000000000000000000000000000000
-000000000000f0f000f00f000000f0f000f00f000000000000000000000000f00f000000000000f00f0000000000000000000000000000000000000000000000
-00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
-00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
+0000000000111177fff777000777771fffff7770000777777f77700000000ff77ff00000000000111100000000000f7777f000000088880000bbbb0000000000
+00000000000777777f77700000111177fff77700000777777777700000000f7777f0000000000ff77ff000000000077777700000080000800b0000b000000000
+000000000007777777777000000777777f7770000007777777777700000007777770000000000f7777f00000000007777770000088000088bb0000bb00000000
+0000000000077777777777000007777777777700000ff0ff07f07f000000077777700000000007777770000000000ff00ff0000080800808b0b00b0b00000000
+00000000000f707f077077000007777777777700000000000000000000000f7007f000000000077777700000000000000000000080800808b0b00b0b00000000
+000000000000f0f000f00f000000f0f000f00f000000000000000000000000f00f000000000000f00f000000000000000000000088000088bb0000bb00000000
+00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000080000800b0000b000000000
+000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000088880000bbbb0000000000
 0000000000000000000000000000000000000f0000f00000ffffffff000000000000000000000000000006666666666000000000000066666666666000000000
-00000f0000f00000000000000000000000000ff77ff0000088888888000000000000000000000000000006666666666000aaaa00000666666666666000000000
-00000ff77ff0000000000f0000f0000000000f7777f0000088888888000000004444444444444440000006666666666007aaaa70006666666666606000000000
-00000f7777f0000000000ff77ff000000000077ff77000008888888800000000444444444444444000000666666666600a7aa7a0066666666666006000000000
-0000077ff770000000000f7777f0000000000077f70000000888888000000000444444444444444000000666666666600a7aa7a0060060000006000000000000
-00000077f7000000000007777770000000000017710000000888888000000ccc4444444544444440000006666666666007aaaa70060000000006000000000000
-00000017710000000000007ff7000000000007f77f7000000088880000cccccc4444444444444440000006666666666000aaaa00060000000006000000000000
+00000f0000f00000000000000000000000000ff77ff0000088888888000000000000000000000000000006666666666000999900000666666666666000000000
+00000ff77ff0000000000f0000f0000000000f7777f0000088888888000000004444444444444440000006666666666007999970006666666666606000000000
+00000f7777f0000000000ff77ff000000000077ff770000088888888000000004444444444444440000006666666666009799790066666666666006000000000
+0000077ff770000000000f7777f0000000000077f700000008888880000000004444444444444440000006666666666009799790060060000006000000000000
+00000077f7000000000007777770000000000017710000000888888000000ccc4444444544444440000006666666666007999970060000000006000000000000
+00000017710000000000007ff7000000000007f77f7000000088880000cccccc4444444444444440000006666666666000999900060000000006000000000000
 00000ff77ff0000000000017f1000000000007777770000000888800cccccccc4444444444444440000000000000000000000000060000000006000000000000
 00000f7777f0000000000ff77ff00000000007777770000078880000000000004555555555555540000066666666666000000000000000000000000000000000
-000007777770000000000f7777f00000000007777770000078888800000000004444444444444440000666666666666000888800000000000000000000000000
-0000077777700000000007777770000000000f7007f0000078888888000000004444444444444440006666666666606008888880000000000000000000000000
+000007777770000000000f7777f00000000007777770000078888800000000004444444444444440000666666666666000eeee00000000000000000000000000
+0000077777700000000007777770000000000f7007f000007888888800000000444444444444444000666666666660600eeeeee0000000000000000000000000
 00000770077000000000077777700000000000000000000078888888000000004444444544444440066666666666006007777770000000000000000000000000
 00000f0000f0000000000f0000f00000000000000000000078888888000000004444444444444440060060000006006007777770000000000000000000000000
-00000000000000000000000000000000000000000000000078888888000000004444444444444440060000000006000008888880000000000000000000000000
-00000000000000000000000000000000000000000000000078888800000000004444444444444440060000000006000000888800000000000000000000000000
+0000000000000000000000000000000000000000000000007888888800000000444444444444444006000000000600000eeeeee0000000000000000000000000
+00000000000000000000000000000000000000000000000078888800000000004444444444444440060000000006000000eeee00000000000000000000000000
 00000000000000000000000000000000000000000000000078880000000000000000000000000000060000000006000000000000000000000000000000000000
 dd444444dd444444444444dd4444444444444444444444dd22222222dddddddd99944999dddddddddddddddddddddddddddddddddddddddddddddddd55555555
 dd444444dd444444444444dd4444444444444444444444dd22222222dddddddd99499499dddddddddddddddddddddddddddddddddddddddddddddddd50000075
@@ -657,11 +684,11 @@ fffff44f5554555545777754d5555555555555555555555d55555555d55555555555555d00000000
 fffff4ff5d555d5455777755d555555555555555dddddddddddddddddddddddd5555555d00000000000000000000000000000000ffffffffffffffffbbb3bb3b
 00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000f44444444444444fbbbbbbbb
 00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000f44445444454444fb33bb3bb
-008888000000000000bbbb0000000000001111000000000000aaaa00000000000000000000000000000000000000000000000000f44445444454444fbb3beb3b
-08888880008888000bbbbbb000bbbb0001111110001111000aaaaaa000aaaa000000000000000000000000000000000000000000f44445444454444fbbbeae3b
-68888886688888866bbbbbb66bbbbbb661111116611111166aaaaaa66aaaaaa60000000000000000000000000000000000000000f44444444444444fb3bbebdb
-68888886688888866bbbbbb66bbbbbb661111116611111166aaaaaa66aaaaaa60000000000000000000000000000000000000000ffffffffffffffffb93bbdad
-0666666006666660066666600666666006666660066666600666666006666660000000000000000000000000000000000000000011155111111551119a9bbbdb
+008888000000000000bbbb0000000000001111000000000000aaaa00000000000055550000000000000000000000000000000000f44445444454444fbb3beb3b
+08888880008888000bbbbbb000bbbb0001111110001111000aaaaaa000aaaa000555555000000000000000000000000000000000f44445444454444fbbbeae3b
+68888886688888866bbbbbb66bbbbbb661111116611111166aaaaaa66aaaaaa66555555600000000000000000000000000000000f44444444444444fb3bbebdb
+68888886688888866bbbbbb66bbbbbb661111116611111166aaaaaa66aaaaaa66555555600000000000000000000000000000000ffffffffffffffffb93bbdad
+0666666006666660066666600666666006666660066666600666666006666660066666600000000000000000000000000000000011155111111551119a9bbbdb
 000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000001111111111111111b9b3bb3b
 74747474747474747474747474747474741444444444444444444444444444442400000000000000000000000000000000144444444444444444444444444444
 24000000001626162616261626162616261626162600364646464646464646464646464646053646464646464646464646464646468605000000000000000000
