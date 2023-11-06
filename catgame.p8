@@ -9,7 +9,6 @@ __lua__
 flist = { 0, 0, 0 }
 
 function _init()
-	printh("you started the game!") --TESTING
 	title_init()
 end
 
