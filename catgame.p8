@@ -9,6 +9,7 @@ __lua__
 flist = { 0, 0, 0 }
 
 function _init()
+	printh("you started the game!") --TESTING
 	title_init()
 end
 
@@ -357,19 +358,27 @@ function colorcombo_house(p,b)
 		b.frame[1]=113
 		add(attempt_h,"r")
 		if(count(attempt_h)!=1) then
-			deli(attempt_h)
-		 reset_buttons(b)
+			deli(attempt_h) -- pops last item in list
+			if(attempt_h[1] != "r") then
+				printh("time to reset those buttons!") -- TESTING
+				reset_buttons(b)
+				attempt_h = {}
+			end
 		end
 	end
 	
 	if objcollision(p.x,p.y,p.w,p.h,
 	b.x[2],b.y[2],b.w,b.h) and
 	btnp(❎) then
+		printh("green button pressed") --TESTING
 		b.frame[2]=115
 		add(attempt_h,"g")
 		if(count(attempt_h)!=2) then
 			deli(attempt_h)
-		 reset_buttons(b)
+			if(attempt_h[2] != "g") then
+				reset_buttons(b)
+				attempt_h = {}
+			end
 		end
 	end
 	
@@ -380,7 +389,10 @@ function colorcombo_house(p,b)
 		add(attempt_h,"b")
 		if(count(attempt_h)!=3) then
 			deli(attempt_h)
-			reset_buttons(b)
+			if(attempt_h[3] != "b") then
+				reset_buttons(b)
+				attempt_h = {}
+			end
 		end
 	end
 	
@@ -390,8 +402,11 @@ function colorcombo_house(p,b)
 		b.frame[4]=119
 		add(attempt_h,"y")
 		if(count(attempt_h)!=4) then
-		 deli(attempt_h)
-			reset_buttons(b)
+		 	deli(attempt_h)
+			if(attempt_h[4] != "y") then
+				reset_buttons(b)
+				attempt_h = {}
+			end
 		end
 	end
 	
