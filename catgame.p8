@@ -361,6 +361,8 @@ function rat_collide()
 				hearts.onscreen[2]=false
 			elseif (hearts.onscreen[1]) then
 				hearts.onscreen[1]=false
+				--Resets stage:
+				game_init() --(Might need to alter this once game works with multiple stages)
 			end
 		end
 		ratcollided = true --marks that they already impacted
@@ -650,15 +652,13 @@ function hearts_draw()
 	if (hearts.onscreen[3]) then
 		spr(62, hearts.x[3], hearts.y, hearts.size, hearts.size)
 	end
-	--spr(62, hearts.x[1], hearts.y, hearts.size, hearts.size)
-	--spr(62, hearts.x[2], hearts.y, hearts.size, hearts.size)
-	--spr(62, hearts.x[3], hearts.y, hearts.size, hearts.size)
 
 end
 
 function rat_draw()
 	--rat sprite
-	if (ratcollided == false) then spr(61, rat.x, rat.y, rat.size, rat.size, rat.flipped)
+	if (ratcollided == false) then 
+		spr(61, rat.x, rat.y, rat.size, rat.size, rat.flipped)
 	else
 		spr(63, rat.x, rat.y, rat.size, rat.size, rat.flipped)
 	end
@@ -719,6 +719,12 @@ function room_cam(p)
 	local mapx = flr(p.x/128)*16 
 	local mapy = flr(p.y/128)*16
 	camera(mapx*8,mapy*8)
+
+	--changes hearts to the corner of whichever screen/room player goes to
+	hearts.x[1] = mapx*8 + 2;
+	hearts.x[2] = mapx*8 + 10;
+	hearts.x[3] = mapx*8 + 18;
+	hearts.y = mapy*8 + 2;
 end
 __gfx__
 000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000f0000f000000088880000bbbb0000000000
