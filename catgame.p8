@@ -41,11 +41,30 @@ function game_init()
 	pose = 7
 	--frame when still
 
+	ratcollided = false --for rat collision
+
 	--player cat class/table
 	cat = {
 		x=56, y=56, w=14, h=14, --position(x,y), width, height
 		size=2, flipped=false, --sprite size, flipping the sprite
-		collision=false
+		collision=true
+	}
+
+	--enemy rat class/table
+	rat = {
+		x=60, y=100, --position(x,y)  (turn these into lists if you want multiple rats)
+		w=8, h=5, --width, height
+		size=1, flipped=true,
+		collision=true,
+		direction=1 --stores what direction to go
+	}
+
+	-- hearts (system for tracking damage taken)
+	hearts = {
+		x={2, 10, 18}, y=2, --locations of each heart on screen
+		w=7, h=8, --width, height
+		size=1,
+		onscreen={true, true, true} --whether each heart should be on screen
 	}
 
 	--chair class/table
@@ -154,6 +173,8 @@ function game_update()
 	stage_check(cat,house)
 	housesigns(ball,msign,door)
 	colorcombo_house(cat,pushbtn)
+	rat_move() 
+	rat_collide() --checks if rat & cat collided & deletes health
 	
 	if colorcombo_house(cat,pushbtn) then
 		door2.frame={91,75,92,76}
@@ -307,6 +328,44 @@ function player_ctrl()
 		flist = {1, 3, 5}
 		pose = 1
 		cat.flipped = true --backwards ⬅️ sprite
+	end
+end
+
+--rat movement
+function rat_move()
+
+	rat.x += rat.direction --changes x position
+
+	--if it collides with map
+	if(mapCollision(rat)) then
+		rat.direction = -rat.direction --changes direction
+		--flips rat
+		if rat.flipped then
+			rat.flipped = false
+		else
+			rat.flipped = true
+		end
+	end
+
+end
+
+--rat collision
+function rat_collide()
+	if objcollision(rat.x,rat.y,rat.w,rat.h,
+					cat.x,cat.y,cat.w,cat.h) then --if rat & cat collide
+		if (ratcollided == false) then --if hasn't been colliding (1st impact)
+			--get rid of 1 heart
+			if (hearts.onscreen[3]) then
+				hearts.onscreen[3]=false
+			elseif (hearts.onscreen[2]) then
+				hearts.onscreen[2]=false
+			elseif (hearts.onscreen[1]) then
+				hearts.onscreen[1]=false
+			end
+		end
+		ratcollided = true --marks that they already impacted
+	else --if rat & cat are not colliding
+		ratcollided = false
 	end
 end
  
@@ -564,6 +623,8 @@ function map_draw()
 	interact_draw()
 	player_draw()
 	props_draw()
+	rat_draw()
+	hearts_draw()
 	if showend==true then
 		cls()
 		print("you escaped the house!",275,56)
@@ -576,6 +637,29 @@ function player_draw()
 	--flr rounds down to nearest int
 	--gets item 1-3 from flist
 	--spr(framenum,x,y,framesize,framesize,flipped?)
+end
+
+function hearts_draw()
+	--hearts sprites:
+	if (hearts.onscreen[1]) then
+		spr(62, hearts.x[1], hearts.y, hearts.size, hearts.size)
+	end
+	if (hearts.onscreen[2]) then
+		spr(62, hearts.x[2], hearts.y, hearts.size, hearts.size)
+	end
+	if (hearts.onscreen[3]) then
+		spr(62, hearts.x[3], hearts.y, hearts.size, hearts.size)
+	end
+	--spr(62, hearts.x[1], hearts.y, hearts.size, hearts.size)
+	--spr(62, hearts.x[2], hearts.y, hearts.size, hearts.size)
+	--spr(62, hearts.x[3], hearts.y, hearts.size, hearts.size)
+
+end
+
+function rat_draw()
+	--rat sprite
+	spr(61, rat.x, rat.y, rat.size, rat.size, rat.flipped)
+
 end
 
 function props_draw()
@@ -660,12 +744,12 @@ __gfx__
 00000017710000000000007ff7000000000007f77f7000000088880000cccccc4444444444444440000006666666666000999900060000000006000000000000
 00000ff77ff0000000000017f1000000000007777770000000888800cccccccc4444444444444440000000000000000000000000060000000006000000000000
 00000f7777f0000000000ff77ff00000000007777770000078880000000000004555555555555540000066666666666000000000000000000000000000000000
-000007777770000000000f7777f00000000007777770000078888800000000004444444444444440000666666666666000eeee00000000000000000000000000
-0000077777700000000007777770000000000f7007f000007888888800000000444444444444444000666666666660600eeeeee0000000000000000000000000
-00000770077000000000077777700000000000000000000078888888000000004444444544444440066666666666006007777770000000000000000000000000
-00000f0000f0000000000f0000f00000000000000000000078888888000000004444444444444440060060000006006007777770000000000000000000000000
-0000000000000000000000000000000000000000000000007888888800000000444444444444444006000000000600000eeeeee0000000000000000000000000
-00000000000000000000000000000000000000000000000078888800000000004444444444444440060000000006000000eeee00000000000000000000000000
+000007777770000000000f7777f00000000007777770000078888800000000004444444444444440000666666666666000eeee00000044400088088000000000
+0000077777700000000007777770000000000f7007f000007888888800000000444444444444444000666666666660600eeeeee0004444440888888800000000
+00000770077000000000077777700000000000000000000078888888000000004444444544444440066666666666006007777770048444440088888000000000
+00000f0000f0000000000f0000f00000000000000000000078888888000000004444444444444440060060000006006007777770e44444440008880000000000
+0000000000000000000000000000000000000000000000007888888800000000444444444444444006000000000600000eeeeee00000000e0000800000000000
+00000000000000000000000000000000000000000000000078888800000000004444444444444440060000000006000000eeee00000eeeee0000000000000000
 00000000000000000000000000000000000000000000000078880000000000000000000000000000060000000006000000000000000000000000000000000000
 dd444444dd444444444444dd4444444444444444444444dd22222222dddddddd99944999dddddddddddddddddddddddddddddddddddddddddddddddd55555555
 dd444444dd444444444444dd4444444444444444444444dd22222222dddddddd99499499dddddddddddddddddddddddddddddddddddddddddddddddd50000075
