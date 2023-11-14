@@ -47,7 +47,7 @@ function game_init()
 	cat = {
 		x=56, y=56, w=14, h=14, --position(x,y), width, height
 		size=2, flipped=false, --sprite size, flipping the sprite
-		collision=true
+		collision=false
 	}
 
 	--enemy rat class/table
@@ -171,7 +171,7 @@ function game_update()
 		door.x[i], door.y[i], door.w, door.h)
 		and door.unlocked == true then
 			cat.x = 312
-			cat.y = 100
+			cat.y = 110
 		end
 	end
 	 
@@ -192,7 +192,8 @@ function game_update()
 			if objcollision(cat.x,cat.y,cat.w,cat.h,
 			door2.x[i],door2.y[i],door2.w,door2.h)
 			and door2.unlocked==true then
-				showend=true
+				cat.x = 564
+				cat.y = 110
 			end
 		end
 	end
