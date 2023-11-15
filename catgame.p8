@@ -7,7 +7,8 @@ __lua__
 
 --global variable
 flist = { 0, 0, 0 }
-
+doorOpenSFX = true
+doorOpenSFX2 = true
 function _init()
 	title_init()
 end
@@ -185,6 +186,10 @@ function game_update()
 		if colorcombo_house(cat,pushbtn) then
 			door2.frame={91,75,92,76}
 			door2.unlocked=true
+			if doorOpenSFX2 then
+				sfx(2)
+				doorOpenSFX2 = false
+			end
 		end
 	
 		for i=1,4 do
@@ -213,6 +218,7 @@ function player_ctrl()
 			if i<3 and objcollision(cat.x,cat.y - 1,cat.w,cat.h,
 			ball.x[i], ball.y[i], ball.w, ball.h) then
 				ball.y[i] -= 1
+				sfx(5) --ball rolling sfx
 			end
 			if i<4 and objcollision(cat.x, cat.y, cat.w, cat.h,
 			door.x[i], door.y[i], door.w, door.h) then
@@ -252,6 +258,7 @@ function player_ctrl()
 				ball.x[i], ball.y[i], ball.w, ball.h
 			) then
 				ball.y[i]+=1
+				sfx(5) --ball rolling sfx
 			end
 		end
 		--if col w/ cup
@@ -284,6 +291,7 @@ function player_ctrl()
 				ball.x[i], ball.y[i], ball.w, ball.h
 			) then
 				ball.x[i] -= 1
+				sfx(5) --ball rolling sfx
 			end
 		end
 		--if col w/ cup, change cup
@@ -295,6 +303,7 @@ function player_ctrl()
 			if cup.frame == 38 then
 				--if not already changed
 				cup.frame = 54
+				sfx(4) --water sfx
 			end
 		end
 		--pos change if able:
@@ -318,6 +327,7 @@ function player_ctrl()
 				ball.x[i], ball.y[i], ball.w, ball.h
 			) then
 				ball.x[i] += 1
+				sfx(5) --ball rolling sfx
 			end
 		end
 		--if col w/ cup, change cup
@@ -328,6 +338,7 @@ function player_ctrl()
 				--if not already changed
 				cup.frame = 54
 				cup.flipped = true
+				sfx(4) --water sfx
 			end
 		end
 		--pos change if able:
@@ -348,6 +359,7 @@ function rat_move()
 	if(mapCollision(rat)) then
 		rat.direction = -rat.direction --changes direction
 		--flips rat
+		sfx(3)
 		if rat.flipped then
 			rat.flipped = false
 		else
@@ -372,6 +384,7 @@ function rat_collide()
 				--Resets stage:
 				game_init() --(Might need to alter this once game works with multiple stages)
 			end
+			sfx(1) -- plays damage sound effect
 		end
 		ratcollided = true --marks that they already impacted
 	else --if rat & cat are not colliding
@@ -423,7 +436,7 @@ function colorcombo_house(p,b)
 	if objcollision(p.x,p.y,p.w,p.h,
 	b.x[1],b.y[1],b.w,b.h) and
 	btnp(❎) then
-	sfx(01)
+	sfx(0)
 		b.frame[1]=113
 		add(attempt_h,"r")
 		if(count(attempt_h)!=1) then
@@ -440,7 +453,7 @@ function colorcombo_house(p,b)
 	b.x[2],b.y[2],b.w,b.h) and
 	btnp(❎) then
 		printh("green button pressed")
-		sfx(01)
+		sfx(0)
 		 --TESTING
 		b.frame[2]=115
 		add(attempt_h,"g")
@@ -456,7 +469,7 @@ function colorcombo_house(p,b)
 	if objcollision(p.x,p.y,p.w,p.h,
 	b.x[3],b.y[3],b.w,b.h) and
 	btnp(❎) then
-	sfx(01)
+	sfx(0)
 		b.frame[3]=117
 		add(attempt_h,"b")
 		if(count(attempt_h)!=3) then
@@ -471,7 +484,7 @@ function colorcombo_house(p,b)
 	if objcollision(p.x,p.y,p.w,p.h,
 	b.x[4],b.y[4],b.w,b.h) and
 	btnp(❎) then
-	sfx(01)
+	sfx(0)
 		b.frame[4]=119
 		add(attempt_h,"y")
 		if(count(attempt_h)!=4) then
@@ -563,6 +576,10 @@ function housesigns(b,m,d)
 	if sign1 and sign2 then
 		d.unlocked = true
 		d.frame = {91,75,92,76}
+		if doorOpenSFX then 
+			sfx(2)
+			doorOpenSFX = false
+		end
 	else
 		d.unlocked = false
 		d.frame = {89,73,90,74}
@@ -989,10 +1006,10 @@ __map__
 __sfx__
 0001000000000000002a0502b0502f050000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
 00021f02000503a0500305005050070502f0500b0502c0500b0500c0500e0500e0501005013050150501705018050190501b0501f0502205024050270502c05031050370503c0503e0503f0503e0503f05000000
-4e040000276501f650006002b7002760000600106002b650356500260002600036001d600216001e60002700206701e65000600056000160020600296502e6500000000000000000000000000000000000000000
+4e040000276501f650006002b7002760000600106002b650356500260002600036001d600216001e60002700206001e60000600056000160020600296002e6000000000000000000000000000000000000000000
 660223021b0501f050230501505013600186002b6000f050170501a05018050150503c0003e000140501d0502105025050180501405000600046000d60018050230502c050370503a050330502a0503e0003e000
 00020000260502a0503105032050330503605037050350503505037550370503705032650346503d650315502f5502d55025550276502a650205501c6501d650216501b5501655015050226500b5501565014650
-a6100000066100561005610076100861007610066100661007610086200a6100b6100a61008610086200760007620076100561003610036100361005610076100861008610086100762005610046000260001610
+a6100000066100561006610076000860009100066000660007600022000a6000e3000a6000860008600076000a400076000560003600036000360016500076000860008600216000760005600046000260001600
 __music__
 04 01024344
 
