@@ -9,6 +9,7 @@ __lua__
 flist = { 0, 0, 0 }
 doorOpenSFX = true
 doorOpenSFX2 = true
+
 function _init()
 	title_init()
 end
@@ -26,7 +27,6 @@ function title_init()
 	--states
 	_update = title_update
 	_draw = title_draw
-
 	--cat animation stuff
 	frame = 1
 	flist = {1, 3, 5}
@@ -43,7 +43,7 @@ function game_init()
 	--frame when still
 
 	ratcollided = false --for rat collision
-
+	stage = 1
 	--player cat class/table
 	cat = {
 		x=56, y=56, w=14, h=14, --position(x,y), width, height
@@ -136,7 +136,6 @@ function game_init()
 	puzSolve = false
 	--showEnd
 	showend = false
-	stage = 0
 end
 -->8
 --[update tab]
@@ -158,26 +157,28 @@ end
 function game_update()
 	flist = { pose, pose, pose }
 	level = "house"
-	--if no buttons pressed, canmove=true
 
-	--frame change
 	if frame < 3.9 then
 		frame += .3 --sets anim speed
 	else
 		frame = 1
 	end
+
 	for i = 1, 4 do
 		if objcollision(cat.x, cat.y, cat.w, cat.h,
 		door.x[i], door.y[i], door.w, door.h)
 		and door.unlocked == true then
 			cat.x = 312
 			cat.y = 110
+			stage = 2
 		end
 	end
-	 
+	if stage == 1 then 
+		rat_move()
+		rat_collide() 
+	end 
 	player_ctrl()
-	rat_move() 
-	rat_collide() --checks if rat & cat collided & deletes health
+
 	if level=="house" then
 		stage_check(cat,house)
 		housesigns(ball,msign,door)
