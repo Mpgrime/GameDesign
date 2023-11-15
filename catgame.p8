@@ -48,7 +48,7 @@ function game_init()
 	cat = {
 		x=56, y=56, w=14, h=14, --position(x,y), width, height
 		size=2, flipped=false, --sprite size, flipping the sprite
-		collision=false
+		collision=true
 	}
 
 	--enemy rat class/table
