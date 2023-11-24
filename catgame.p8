@@ -45,6 +45,7 @@ function game_init()
 
 	ratcollided = false --for rat collision
 	stage = 1
+
 	--player cat class/table
 	cat = {
 		x=56, y=56, w=14, h=14, --position(x,y), width, height
@@ -54,11 +55,13 @@ function game_init()
 
 	--enemy rat class/table
 	rat = {
-		x=60, y=100, --position(x,y)  (turn these into lists if you want multiple rats)
+		x={60,200}, y={100,200}, --positions(x,y)
+		--x=60, y=100,
 		w=8, h=5, --width, height
 		size=1, flipped=true,
 		collision=true,
-		direction=1 --stores what direction to go
+		direction=1, --stores what direction to go
+		rat_num = 0 --stores which rats should be spawned (numbers correlate with position list indexes)
 	}
 
 	-- hearts (system for tracking damage taken)
@@ -169,10 +172,12 @@ function game_update()
 			stage = 2
 		end
 	end
-	if stage == 1 then 
-		rat_move()
-		rat_collide() 
-	end 
+	
+	rat_move()
+	if(rat_num != 0) then
+		rat_collide()
+	end
+
 	player_ctrl()
 
 	if level=="house" then
@@ -298,7 +303,7 @@ function player_ctrl()
 		end
 		--pos change if able:
 		if canmove then cat.y -= 1 end
-		if mapCollision(cat) then cat.y += 1 end
+		if mapCollision(cat, 0) then cat.y += 1 end
 		--frame set change
 		flist = { 32, 34, 36 }
 		--pose change
@@ -334,7 +339,7 @@ function player_ctrl()
 		end
 		--pos change if able:
 		if canmove then cat.y += 1 end
-		if mapCollision(cat) then cat.y -= 1 end
+		if mapCollision(cat, 0) then cat.y -= 1 end
 		flist = {7, 9, 11}
 		pose = 7
 		cat.flipped = false
@@ -372,7 +377,7 @@ function player_ctrl()
 		end
 		--pos change if able:
 		if canmove then cat.x -= 1 end
-	 if mapCollision(cat) then cat.x += 1 end
+	 if mapCollision(cat, 0) then cat.x += 1 end
 		flist = {1, 3, 5}
 		pose = 1
 		cat.flipped = false
@@ -407,7 +412,7 @@ function player_ctrl()
 		end
 		--pos change if able:
 		if canmove then cat.x+=1 end
-		if mapCollision(cat) then cat.x-=1 end
+		if mapCollision(cat, 0) then cat.x-=1 end
 		flist = {1, 3, 5}
 		pose = 1
 		cat.flipped = true --backwards ⬅️ sprite
@@ -417,25 +422,35 @@ end
 --rat movement
 function rat_move()
 
-	rat.x += rat.direction --changes x position
-
-	--if it collides with map
-	if(mapCollision(rat)) then
-		rat.direction = -rat.direction --changes direction
-		--flips rat
-		sfx(3)
-		if rat.flipped then
-			rat.flipped = false
-		else
-			rat.flipped = true
-		end
+	--checks what stage and thus what rat should be spawned
+	if(stage_check(cat, house) == 1) then
+		rat_num = 1
+	elseif(stage_check(cat, house) == 5) then
+		rat_num = 2
+	else
+		rat_num = 0
 	end
 
+	if(rat_num != 0) then --if the room should have a rat in it
+		rat.x[rat_num] += rat.direction --changes x position
+
+		--if it collides with map
+		if(mapCollision(rat, rat_num)) then
+			rat.direction = -rat.direction --changes direction		
+			sfx(3) --plays rat sound effects
+			--flips rat		
+			if rat.flipped then
+				rat.flipped = false
+			else
+				rat.flipped = true
+			end
+		end
+	end
 end
 
 --rat collision
 function rat_collide()
-	if objcollision(rat.x,rat.y,rat.w,rat.h,
+	if objcollision(rat.x[rat_num],rat.y[rat_num],rat.w,rat.h,
 					cat.x,cat.y,cat.w,cat.h) then --if rat & cat collide
 		if (ratcollided == false) then --if hasn't been colliding (1st impact)
 			--get rid of 1 heart
@@ -671,16 +686,29 @@ function objcollision(x1, y1, w1, h1, x2, y2, w2, h2)
 	return hit
 end
 --returns true if colliding with edge tile
-function mapCollision(obj)
+function mapCollision(obj, num) --num is index of location in list of locations (0 means that x & y coordinates are not in list form)
 	local d = false --is colliding left
 	local c = false --is colliding bottom
 	local b = false --is colliding right
 	local a = false --is colliding top
+
+	local x1 = 0 --left bound
+	local y1 = 0 --top bound
+	local x2 = 0 --right bound
+	local y2 = 0 --bottom bound
+	
 	-- get coords of object
-	local x1 = (obj.x+7)/8 --left bound
-	local y1 = (obj.y+15)/8 --top bound
-	local x2 = (obj.x+23)/8 --right bound
-	local y2 = (obj.y+23)/8 --bottom bound
+	if (num == 0) then
+		x1 = (obj.x+7)/8 --left bound
+		y1 = (obj.y+15)/8 --top bound
+		x2 = (obj.x+23)/8 --right bound
+		y2 = (obj.y+23)/8 --bottom bound
+	else
+		x1 = (obj.x[num]+7)/8 --left bound
+		y1 = (obj.y[num]+15)/8 --top bound
+		x2 = (obj.x[num]+23)/8 --right bound
+		y2 = (obj.y[num]+23)/8 --bottom bound
+	end
 	d = fget(mget(x1, y1), 0) --check if the next tile has flag 0 set
 	c = fget(mget(x1, y2), 0)
 	b = fget(mget(x2, y1), 0)
@@ -761,9 +789,9 @@ end
 function rat_draw()
 	--rat sprite
 	if (ratcollided == false) then 
-		spr(61, rat.x, rat.y, rat.size, rat.size, rat.flipped)
+		spr(61, rat.x[rat_num], rat.y[rat_num], rat.size, rat.size, rat.flipped)
 	else
-		spr(63, rat.x, rat.y, rat.size, rat.size, rat.flipped)
+		spr(63, rat.x[rat_num], rat.y[rat_num], rat.size, rat.size, rat.flipped)
 	end
 end
 
