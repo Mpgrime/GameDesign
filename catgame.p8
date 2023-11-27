@@ -87,7 +87,7 @@ function game_init()
 
 	--ball class/table
 	ball = {
-	x={88,32},y={88,88},w=6,h=6
+	x={88,32},y={88,88},w=6,h=6, collision = true
 	}
 
 	--cup class/table
@@ -288,6 +288,10 @@ function player_ctrl()
 			ball.x[i], ball.y[i], ball.w, ball.h) then
 				ball.y[i] -= 1
 				sfx(5) --ball rolling sfx
+				if mapCollision(ball.x[i],ball.y[i]-8,ball.collision, 0) then
+					ball.y[i] += 1
+					cat.y += 1
+				end
 			end
 			if i<4 and objcollision(cat.x, cat.y, cat.w, cat.h,
 			door.x[i], door.y[i], door.w, door.h) then
@@ -303,7 +307,7 @@ function player_ctrl()
 		end
 		--pos change if able:
 		if canmove then cat.y -= 1 end
-		if mapCollision(cat, 0) then cat.y += 1 end
+		if mapCollision(cat.x, cat.y,cat.collision, 0) then cat.y += 1 end
 		--frame set change
 		flist = { 32, 34, 36 }
 		--pose change
@@ -328,6 +332,10 @@ function player_ctrl()
 			) then
 				ball.y[i]+=1
 				sfx(5) --ball rolling sfx
+				if mapCollision(ball.x[i],ball.y[i]-8,ball.collision, 0) then
+					ball.y[i] -= 1
+					cat.y -= 1
+				end
 			end
 		end
 		--if col w/ cup
@@ -339,7 +347,7 @@ function player_ctrl()
 		end
 		--pos change if able:
 		if canmove then cat.y += 1 end
-		if mapCollision(cat, 0) then cat.y -= 1 end
+		if mapCollision(cat.x, cat.y, cat.collision, 0) then cat.y -= 1 end
 		flist = {7, 9, 11}
 		pose = 7
 		cat.flipped = false
@@ -361,6 +369,10 @@ function player_ctrl()
 			) then
 				ball.x[i] -= 1
 				sfx(5) --ball rolling sfx
+				if mapCollision(ball.x[i],ball.y[i],ball.collision, 0) then
+					ball.x[i] += 1
+					cat.x += 1
+				end
 			end
 		end
 		--if col w/ cup, change cup
@@ -377,7 +389,7 @@ function player_ctrl()
 		end
 		--pos change if able:
 		if canmove then cat.x -= 1 end
-	 if mapCollision(cat, 0) then cat.x += 1 end
+	 if mapCollision(cat.x, cat.y,cat.collision, 0) then cat.x += 1 end
 		flist = {1, 3, 5}
 		pose = 1
 		cat.flipped = false
@@ -397,6 +409,10 @@ function player_ctrl()
 			) then
 				ball.x[i] += 1
 				sfx(5) --ball rolling sfx
+				if mapCollision(ball.x[i],ball.y[i],ball.collision, 0) then
+					ball.x[i] -= 1
+					cat.x -= 1
+				end
 			end
 		end
 		--if col w/ cup, change cup
@@ -412,7 +428,7 @@ function player_ctrl()
 		end
 		--pos change if able:
 		if canmove then cat.x+=1 end
-		if mapCollision(cat, 0) then cat.x-=1 end
+		if mapCollision(cat.x, cat.y,cat.collision, 0) then cat.x-=1 end
 		flist = {1, 3, 5}
 		pose = 1
 		cat.flipped = true --backwards ⬅️ sprite
@@ -435,7 +451,7 @@ function rat_move()
 		rat.x[rat_num] += rat.direction --changes x position
 
 		--if it collides with map
-		if(mapCollision(rat, rat_num)) then
+		if(mapCollision(rat.x, rat.y, rat.collision, rat_num)) then
 			rat.direction = -rat.direction --changes direction		
 			sfx(3) --plays rat sound effects
 			--flips rat		
@@ -686,7 +702,7 @@ function objcollision(x1, y1, w1, h1, x2, y2, w2, h2)
 	return hit
 end
 --returns true if colliding with edge tile
-function mapCollision(obj, num) --num is index of location in list of locations (0 means that x & y coordinates are not in list form)
+function mapCollision(objx, objy, objcollision, num) --num is index of location in list of locations (0 means that x & y coordinates are not in list form)
 	local d = false --is colliding left
 	local c = false --is colliding bottom
 	local b = false --is colliding right
@@ -699,21 +715,21 @@ function mapCollision(obj, num) --num is index of location in list of locations 
 	
 	-- get coords of object
 	if (num == 0) then
-		x1 = (obj.x+7)/8 --left bound
-		y1 = (obj.y+15)/8 --top bound
-		x2 = (obj.x+23)/8 --right bound
-		y2 = (obj.y+23)/8 --bottom bound
+		x1 = (objx+7)/8 --left bound
+		y1 = (objy+15)/8 --top bound
+		x2 = (objx+23)/8 --right bound
+		y2 = (objy+23)/8 --bottom bound
 	else
-		x1 = (obj.x[num]+7)/8 --left bound
-		y1 = (obj.y[num]+15)/8 --top bound
-		x2 = (obj.x[num]+23)/8 --right bound
-		y2 = (obj.y[num]+23)/8 --bottom bound
+		x1 = (objx[num]+7)/8 --left bound
+		y1 = (objy[num]+15)/8 --top bound
+		x2 = (objx[num]+23)/8 --right bound
+		y2 = (objy[num]+23)/8 --bottom bound
 	end
 	d = fget(mget(x1, y1), 0) --check if the next tile has flag 0 set
 	c = fget(mget(x1, y2), 0)
 	b = fget(mget(x2, y1), 0)
 	a = fget(mget(x2, y2), 0) 
-	if obj.collision then
+	if objcollision then
 		if a or b or c or d then --if there will be a collision
 			return true
 		else 
