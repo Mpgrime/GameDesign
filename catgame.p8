@@ -38,7 +38,7 @@ function game_init()
 	--set state
 	_update = game_update
 	_draw = map_draw
-
+	kingratdefeated = false --for win condition
 	frame = 1
 	pose = 7
 	--frame when still
@@ -162,6 +162,19 @@ function title_update()
 	end
 
 	if btnp(❎) then
+		game_init() --starts game
+	end
+end
+
+--when on end screen
+function end_update()
+	if frame < 3.9 then
+		frame += .3 --sets anim speed
+	else
+		frame = 1
+	end
+
+	if btnp(❎) then
 		game_init()
 	end
 end
@@ -248,6 +261,10 @@ function game_update()
 			end
 		end
 		
+	end
+	if kingratdefeated then
+		_draw = end_draw()
+		_update = end_update()
 	end
 end
 
@@ -822,6 +839,16 @@ function debug_draw()
 	print(stage_check(cat,house),cat.x+16,cat.y+24,12)
 end
 
+--draws end screen
+function end_draw()
+	cls()
+	map(1, 18, 0, 0, 128, 64)
+	print("furball productions presents", 9, 20, 6)
+	print("protect your catsle", 26, 55, 1)
+	print("thanks for playing!", 32, 102, 10)
+	print("press ❎ to replay", 32, 120, 10)
+	spr(flist[flr(frame)], 55, 75, 2, 2)
+end
 --draws title screen stuff
 function title_draw()
 	cls()
