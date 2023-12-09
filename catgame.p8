@@ -586,27 +586,27 @@ function stage_check(p, s)
 
 	if playertilex == s.rx[1]
 			and playertiley == s.ry[1] then
-		screen = 1 --starting room
+		screen = 1 --starting room for house
 	end
 	if playertilex == s.rx[2]
 			and playertiley == s.ry[2] then
-		screen = 2 --central room
+		screen = 2 --central room for house
 	end
 	if playertilex == s.rx[3]
 			and playertiley == s.ry[3] then
-		screen = 3 --leftmost room
+		screen = 3 --blue kitchen room for house
 	end
 	if playertilex == s.rx[4]
 			and playertiley == s.ry[4] then
-		screen = 4 --rightmost room
+		screen = 4 --yellow room for house
 	end
 	if playertilex == s.rx[5]
 			and playertiley == s.ry[5] then
-		screen = 5 --down from room3
+		screen = 5 --green carpet room for house
 	end
 	if playertilex == s.rx[6]
 			and playertiley == s.ry[6] then
-		screen = 6 --down from room4
+		screen = 6 --red carpet room for house
 	end
 
 	return screen
