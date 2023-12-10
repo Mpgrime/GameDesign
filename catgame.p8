@@ -51,7 +51,7 @@ function game_init()
 	cat = {
 		x=56, y=56, w=14, h=14, --position(x,y), width, height
 		size=2, flipped=false, --sprite size, flipping the sprite
-		collision=true
+		collision=false --CHANGED FOR TESTING
 	}
 
 	--normal enemy rat class/table
@@ -67,9 +67,7 @@ function game_init()
 
 	--boss/king rat class/table (IN PROGRESS)
 	kingrat = {
-		--x=825, y=145, --position(x,y) (initially places it on throne by top of room)
-		--x=60, y=80, --TESTING POSITION - put into first room for ease of testing
-		x=400, y=200, --TESTING POSITION - put into red carpet room for ease of testing
+		x=825, y=145, --position(x,y) (initially places it on throne by top of room)
 		w=16, h=13, --width, height
 		size=2, flipped=true,
 		collision=true,
@@ -115,8 +113,35 @@ function game_init()
 		frame={112,114,116,118,120}
 	}
 
+	--king rat room puzzle buttons
+	kingbtn={
+		x={777,777,879,879}, y={143,240,143,240}, --{top left (tl), bl, tr, br}
+		w=8,h=8,size=1,
+		frame={118,118,118,118},
+		litbtn=1, --which button is being lit up (0 if none are)
+		time=0 
+	}
+
+	--yellow circles for indicating where to lead king rat
+	ycircle={
+		x=824, y=190,
+		w={16,4}, h={16,4}, size={2,1}, --{big circle, small circle}
+		visible=false
+	}
+
+	--cage that comes down on rat king
+	cage={
+		x=825, y=130,
+		w=16, h=16, size=2,
+		visible=false,
+		timedown=0 --how long cage has been on screen
+	}
+
 	--attempt for house puzzle
 	attempt_h={}
+
+	--attempt for king rat buttons
+	attempt_king={}
 	
 	--door class/table
 	door = {
@@ -259,9 +284,54 @@ function game_update()
 			else
 				level="factory"
 			end
+		end		
+	end
+
+	king_buttons(cat,kingbtn)
+
+	--lighting up king rat buttons red to indicate order
+	kingbtn.time += .1 --time kept track of so it doesn't go too fast
+	if kingbtn.time >= 1 and kingbtn.litbtn > 0 then
+		kingbtn.time = 0
+		kingbtn.frame[kingbtn.litbtn] = 112 --turns current button red
+		if kingbtn.litbtn==4 then
+			kingbtn.frame[3] = 118 --turns last button back to yellow
+			kingbtn.litbtn=1 --switches to next button
+			kingbtn.time=-1 --pauses before next round of indications
+		elseif kingbtn.litbtn==1 then
+			kingbtn.frame[4] = 118 --turns last button back to yellow
+			kingbtn.litbtn+=1 --switches to next button
+		else
+			kingbtn.frame[kingbtn.litbtn-1] = 118 --turns last button back to yellow
+			kingbtn.litbtn+=1 --switches to next button
+		end		
+	end
+
+	--if buttons pushed right
+	if(king_buttons(cat,kingbtn)) then
+		ycircle.visible=true --yellow circle shows up
+
+		--if kingrat collides with the yellow circle
+		if(objcollision(kingrat.x,kingrat.y,kingrat.w,kingrat.h,
+		ycircle.x,ycircle.y,ycircle.w[2],ycircle.h[2])) then
+			cage.visible=true --cage shows up
+		end
+	end
+
+	--bringing cage down
+	if cage.visible then
+		cage.visible=true --draws cage
+
+		if cage.y < ycircle.y then --if cage is higher than ycircle
+			cage.y = cage.y + .5 --sends cage downward
+		elseif cage.timedown < 5 then
+			cage.timedown = cage.timedown+1
+		else
+			kingratdefeated=true
 		end
 		
 	end
+
 	if kingratdefeated then
 		_draw = end_draw()
 		_update = end_update()
@@ -500,13 +570,9 @@ function rat_move()
 end
 
 --king rat movement
---[plan: kingrat should follow cat around
--- so, if kingrat.x < cat.x, then kingrat.x++, etc.]
 function kingrat_move()
 	--checks what stage and thus whether the movement should be happening
-	--if(stage_check(cat, factory) == 6) then --if in rat boss room
-	--if(stage_check(cat, house) == 1) then --TESTING ROOM - 1st room labeled as correct one for ease of testing
-	if(stage_check(cat, house) == 6) then --TESTING ROOM - red carpet room labeled as correct one for ease of testing
+	if(stage_check(cat, factory)==3  and cage.visible==false) then --if in rat boss room and cage hasn't come down yet
 		kingrat.chase = true
 	else
 		kingrat.chase = false
@@ -586,27 +652,27 @@ function stage_check(p, s)
 
 	if playertilex == s.rx[1]
 			and playertiley == s.ry[1] then
-		screen = 1 --starting room for house
+		screen = 1 --starting room
 	end
 	if playertilex == s.rx[2]
 			and playertiley == s.ry[2] then
-		screen = 2 --central room for house
+		screen = 2 --central room
 	end
 	if playertilex == s.rx[3]
 			and playertiley == s.ry[3] then
-		screen = 3 --blue kitchen room for house
+		screen = 3 --leftmost room
 	end
 	if playertilex == s.rx[4]
 			and playertiley == s.ry[4] then
-		screen = 4 --yellow room for house
+		screen = 4 --rightmost room
 	end
 	if playertilex == s.rx[5]
 			and playertiley == s.ry[5] then
-		screen = 5 --green carpet room for house
+		screen = 5 --down from room3
 	end
 	if playertilex == s.rx[6]
 			and playertiley == s.ry[6] then
-		screen = 6 --red carpet room for house
+		screen = 6 --down from room4
 	end
 
 	return screen
@@ -626,7 +692,6 @@ function colorcombo_house(p,b)
 		if(count(attempt_h)!=1) then
 			deli(attempt_h) -- pops last item in list
 			if(attempt_h[1] != "r") then
-				printh("time to reset those buttons!") -- TESTING
 				reset_buttons(b)
 				attempt_h = {}
 			end
@@ -636,9 +701,7 @@ function colorcombo_house(p,b)
 	if objcollision(p.x,p.y,p.w,p.h,
 	b.x[2],b.y[2],b.w,b.h) and
 	btnp(❎) then
-		printh("green button pressed")
 		sfx(0)
-		 --TESTING
 		b.frame[2]=115
 		add(attempt_h,"g")
 		if(count(attempt_h)!=2) then
@@ -703,6 +766,105 @@ function reset_buttons(b)
 	b.frame[2]=114
 	b.frame[3]=116
 	b.frame[4]=118
+end
+
+-- function for king rat button puzzle
+-- parameters: (cat, kingbtn)
+function king_buttons(p,b)
+	local solved = false
+	king_answer = {"tl", "bl", "tr", "br"}
+
+	if objcollision(p.x,p.y,p.w,p.h,
+	b.x[1],b.y[1],b.w,b.h) and
+	btnp(❎) then
+		sfx(0)
+		b.frame[1]=113
+		add(attempt_king,"tl")
+		if(count(attempt_king)!=1) then
+			deli(attempt_king) -- pops last item in list
+			if(attempt_king[1] != "tl") then
+				reset_king_buttons(b)
+				attempt_king = {}
+			else
+				kingbtn.litbtn = 0 --stops the button order indicators
+				--turns all the other buttons back to yellow
+				b.frame[2]=118
+				b.frame[3]=118
+				b.frame[4]=118
+			end
+		end
+	end
+
+	if objcollision(p.x,p.y,p.w,p.h,
+	b.x[2],b.y[2],b.w,b.h) and
+	btnp(❎) then
+		sfx(0)
+		b.frame[2]=113
+		add(attempt_king,"bl")
+		if(count(attempt_king)!=2) then
+			deli(attempt_king) -- pops last item in list
+			if(attempt_king[2] != "bl") then
+				reset_king_buttons(b)
+				attempt_king = {}
+			end
+		end
+	end
+
+	if objcollision(p.x,p.y,p.w,p.h,
+	b.x[3],b.y[3],b.w,b.h) and
+	btnp(❎) then
+		sfx(0)
+		b.frame[3]=113
+		add(attempt_king,"tr")
+		if(count(attempt_king)!=3) then
+			deli(attempt_king) -- pops last item in list
+			if(attempt_king[3] != "tr") then
+				reset_king_buttons(b)
+				attempt_king = {}
+			end
+		end
+	end
+
+	if objcollision(p.x,p.y,p.w,p.h,
+	b.x[4],b.y[4],b.w,b.h) and
+	btnp(❎) then
+		sfx(0)
+		b.frame[4]=113
+		add(attempt_king,"br")
+		if(count(attempt_king)!=4) then
+			deli(attempt_king) -- pops last item in list
+			if(attempt_king[4] != "br") then
+				reset_king_buttons(b)
+				attempt_king = {}
+			end
+		end
+	end
+
+	if count(attempt_king)==4 and 
+	cprtables(attempt_king,king_answer) then
+		solved=true
+	elseif count(attempt_king)>4 and
+	cprtables(attempt_king,king_answer)==false then
+		solved=false
+		while count(attempt_king)>0 do
+			deli(attempt_king)
+		end
+	else
+		solved=false
+	end
+	
+	return solved 
+end
+
+--resets all buttons from king button puzzle to not being pushed
+--parameter: kingbtn
+function reset_king_buttons(b)
+	b.frame[1]=118
+	b.frame[2]=118
+	b.frame[3]=118
+	b.frame[4]=118
+
+	kingbtn.litbtn = 1 --resumes the button order indicators
 end
 
 --compares 2 four-indexed tables
@@ -849,6 +1011,7 @@ function end_draw()
 	print("press ❎ to replay", 32, 120, 10)
 	spr(flist[flr(frame)], 55, 75, 2, 2)
 end
+
 --draws title screen stuff
 function title_draw()
 	cls()
@@ -871,8 +1034,18 @@ function map_draw()
 	player_draw()
 	props_draw()
 	rat_draw()
+
+	if ycircle.visible then
+		ycircle_draw()
+	end
+
 	kingrat_draw()
 	hearts_draw()
+	
+	if cage.visible then
+		cage_draw()
+	end
+
 	--debug_draw()
 	if showend==true then
 		cls()
@@ -914,6 +1087,18 @@ end
 function kingrat_draw()
 	--kingrat sprite
 	spr(150, kingrat.x, kingrat.y, kingrat.size, kingrat.size, kingrat.flipped)
+end
+
+--draws yellow circle indicating where king rat should go
+function ycircle_draw()
+	spr(154, 828, 190, 1, 1) --draws smaller yellow circle (collision happens with this one)
+	--spr(152, 825, 190, 2, 2)
+	spr(152, ycircle.x, ycircle.y, ycircle.size[1], ycircle.size[1]) --draws larger yellow circle
+end
+
+--draws cage
+function cage_draw()
+	spr(155, cage.x, cage.y, cage.size, cage.size)
 end
 
 function props_draw()
@@ -963,6 +1148,11 @@ function interact_draw()
 	spr(pushbtn.frame[3],pushbtn.x[3],pushbtn.y[3],pushbtn.size,pushbtn.size)
 	spr(pushbtn.frame[4],pushbtn.x[4],pushbtn.y[4],pushbtn.size,pushbtn.size)
 	spr(pushbtn.frame[5],pushbtn.x[5],pushbtn.y[5],pushbtn.size,pushbtn.size)
+	--king rat room buttons
+	spr(kingbtn.frame[1],kingbtn.x[1],kingbtn.y[1],kingbtn.size,kingbtn.size)
+	spr(kingbtn.frame[2],kingbtn.x[2],kingbtn.y[2],kingbtn.size,kingbtn.size)
+	spr(kingbtn.frame[3],kingbtn.x[3],kingbtn.y[3],kingbtn.size,kingbtn.size)
+	spr(kingbtn.frame[4],kingbtn.x[4],kingbtn.y[4],kingbtn.size,kingbtn.size)
 end
 
 --changes the camera to whichever screen/room...
@@ -1051,22 +1241,22 @@ dd444444dddddddddddddddd44444444dddddddd444444dd22222222dddddddd99944999dd444444
 00000000000000000000000000000000000000000000000000000000000000000000000000050000000000000000000000000000000005000000000000000000
 00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
 00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
-d111111ddd1111dd111111111111111d11dddd11dd11111100000000000000000000000000000000000000000000000000000000000000000000000000000000
-1111111dd111111d111111111111111d11dddd11d111111100000000000000000000000000000000000000000000000000000000000000000000000000000000
-11dddddd11dddd11ddd11ddd11ddd11d111dd111d1dddddd00a0a0a0044444000000000000000000000000000000000000000000000000000000000000000000
-11dddddd11111111ddd11ddd1111111dd11dd11dd111111d00aaaaa0444444400000000000000000000000000000000000000000000000000000000000000000
-11dddddd11111111ddd11ddd11111dddd11dd11ddd11111100aaaaa4444444440000000000000000000000000000000000000000000000000000000000000000
-11dddddd11dddd11ddd11ddd11d111dddd1111ddddddddd100444444444444440000000000000000000000000000000000000000000000000000000000000000
-1111111d11dddd11ddd11ddd11dd111ddd1111ddd111111104484444444444440000000000000000000000000000000000000000000000000000000000000000
-d111111d11dddd11ddd11ddd11ddd11dddd11dddd111111de4444444444444440000000000000000000000000000000000000000000000000000000000000000
-00000000000000000000000000000000000000000000000004444444444444440000000000000000000000000000000000000000000000000000000000000000
-000000000000000000000000000000000000000000000000000444444444444e0000000000000000000000000000000000000000000000000000000000000000
-000000000000000000000000000000000000000000000000000004e4444e400e0000000000000000000000000000000000000000000000000000000000000000
-0000000000000000000000000000000000000000000000000000eee00eee000e0000000000000000000000000000000000000000000000000000000000000000
-000000000000000000000000000000000000000000000000000000000000000e0000000000000000000000000000000000000000000000000000000000000000
-00000000000000000000000000000000000000000000000000000000000eeeee0000000000000000000000000000000000000000000000000000000000000000
-000000000000000000000000000000000000000000000000000000eeeeee00000000000000000000000000000000000000000000000000000000000000000000
-00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
+d111111ddd1111dd111111111111111d11dddd11dd11111100000000000000000000aaaaaaaa0000000000007777777777777777000000000000000000000000
+1111111dd111111d111111111111111d11dddd11d11111110000000000000000000aaaaaaaaaa000000000007777777777777777000000000000000000000000
+11dddddd11dddd11ddd11ddd11ddd11d111dd111d1dddddd00a0a0a00444440000aaaaaaaaaaaa00000aa0007007007007007007000000000000000000000000
+11dddddd11111111ddd11ddd1111111dd11dd11dd111111d00aaaaa0444444400aaaaaaaaaaaaaa000aaaa007007007007007007000000000000000000000000
+11dddddd11111111ddd11ddd11111dddd11dd11ddd11111100aaaaa444444444aaaaaaaaaaaaaaaa00aaaa007007007007007007000000000000000000000000
+11dddddd11dddd11ddd11ddd11d111dddd1111ddddddddd10044444444444444aaaaaaaaaaaaaaaa000aa0007007007007007007000000000000000000000000
+1111111d11dddd11ddd11ddd11dd111ddd1111ddd11111110448444444444444aaaaaaaaaaaaaaaa000000007007007007007007000000000000000000000000
+d111111d11dddd11ddd11ddd11ddd11dddd11dddd111111de444444444444444aaaaaaaaaaaaaaaa000000007007007007007007000000000000000000000000
+0000000000000000000000000000000000000000000000000444444444444444aaaaaaaaaaaaaaaa000000007007007007007007000000000000000000000000
+000000000000000000000000000000000000000000000000000444444444444eaaaaaaaaaaaaaaaa000000007007007007007007000000000000000000000000
+000000000000000000000000000000000000000000000000000004e4444e400eaaaaaaaaaaaaaaaa000000007007007007007007000000000000000000000000
+0000000000000000000000000000000000000000000000000000eee00eee000eaaaaaaaaaaaaaaaa000000007007007007007007000000000000000000000000
+000000000000000000000000000000000000000000000000000000000000000e0aaaaaaaaaaaaaa0000000007007007007007007000000000000000000000000
+00000000000000000000000000000000000000000000000000000000000eeeee00aaaaaaaaaaaa00000000007007007007007007000000000000000000000000
+000000000000000000000000000000000000000000000000000000eeeeee0000000aaaaaaaaaa000000000007007007007007007000000000000000000000000
+00000000000000000000000000000000000000000000000000000000000000000000aaaaaaaa0000000000007007007007007007000000000000000000000000
 00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
 00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
 00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
