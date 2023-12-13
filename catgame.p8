@@ -184,6 +184,8 @@ function game_init()
 	
 	--is the puzzle solved
 	puzSolve = false
+	--if flowers are solved
+	flower_solved = false
 	--showEnd
 	showend = false
 end
@@ -436,8 +438,10 @@ function player_ctrl()
 			if objcollision(
 				cat.x, cat.y - 1, cat.w, cat.h,
 				fence.x[i], fence.y[i], fence.w, fence.h
-			) then
+			) and flower_solved==false then
 				canmove = false
+				else
+				canmove = true
 			end
 		end
 		--pos change if able:
@@ -484,8 +488,10 @@ function player_ctrl()
 			if objcollision(
 				cat.x, cat.y + 1, cat.w, cat.h,
 				fence.x[i], fence.y[i], fence.w, fence.h
-			) then
+			) and flower_solved==false then
 				canmove = false
+				else
+				canmove = true
 			end
 		end
 		--pos change if able:
@@ -534,8 +540,10 @@ function player_ctrl()
 			if objcollision(
 				cat.x - 1, cat.y, cat.w, cat.h,
 				fence.x[i], fence.y[i], fence.w, fence.h
-			) then
+			) and flower_solved==false then
 				canmove = false
+				else
+				canmove = true
 			end
 		end
 		--pos change if able:
@@ -580,9 +588,11 @@ function player_ctrl()
 		for i = 1,4 do
 			if objcollision(
 				cat.x + 1, cat.y, cat.w, cat.h,
-				fence.x[i], fence.y[i], fence.w, fence.h
-			) then
+				fence.x[i], fence.y[i], fence.w, fence.h)
+				and flower_solved==false then
 				canmove = false
+				else
+				canmove = true
 			end
 		end
 		--pos change if able:
@@ -826,7 +836,6 @@ end
 to progress. Press X to change colors of the flowers. 
 Press the button to confirm your attempted answer. (Still a WIP!)]]
 function flower_puzzle(p,f,b)
-	local solved=false
 	local answer={"blue","ora","pink","pur"}
 	
 	--?could use a for loop for this?
@@ -851,13 +860,9 @@ function flower_puzzle(p,f,b)
 	if objcollision(p.x,p.y,p.w,p.h,
 	b.x[6],b.y[6],b.w,b.h) and btnp(❎) then
 		if cprtables(attempt_f,answer) then
-			solved=true
-			--[[still needs to be implemented,
-			 barrier disapppears]]
+			flower_solved=true
 		else
-			solved=false 
-			--[[still needs to be implemented,
-			flowers reset and "wrong answer" sfx plays]]
+			flower_solved=false 
 		end
 	end
 end
@@ -1234,12 +1239,12 @@ function props_draw()
 	--balls in spawn room
 	spr(44, ball.x[1], ball.y[1], 1, 1)
 	spr(60, ball.x[2], ball.y[2], 1, 1)
-	--fence in flower puzzle (still needs work)
-	spr(fence.frame,fence.x[1],fence.y[1],1,1)
-	spr(fence.frame,fence.x[2],fence.y[2],1,1)
-	spr(fence.frame,fence.x[3],fence.y[3],1,1)
-	spr(fence.frame,fence.x[4],fence.y[4],1,1)
-	
+	if(flower_solved==false) then
+		spr(fence.frame,fence.x[1],fence.y[1],1,1)
+		spr(fence.frame,fence.x[2],fence.y[2],1,1)
+		spr(fence.frame,fence.x[3],fence.y[3],1,1)
+		spr(fence.frame,fence.x[4],fence.y[4],1,1)
+	end
 	--cup sprite:
 	spr(cup.frame, cup.x, cup.y, cup.size, cup.size, cup.flipped)
 	--water sprite:
