@@ -357,6 +357,7 @@ function game_update()
 
 		if cage.y < ycircle.y then --if cage is higher than ycircle
 			cage.y = cage.y + .5 --sends cage downward
+			sfx(5)
 		elseif cage.timedown < 5 then
 			cage.timedown = cage.timedown+1
 		else
@@ -701,6 +702,7 @@ function kingrat_collide()
 					cat.x,cat.y,cat.w,cat.h) then --if kingrat & cat collide
 		if (kingratcollided == false) then --if hasn't been colliding (1st impact)
 			--get rid of 1 heart
+			sfx(1)
 			if (hearts.onscreen[3]) then
 				hearts.onscreen[3]=false
 			elseif (hearts.onscreen[2]) then
