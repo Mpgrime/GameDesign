@@ -401,7 +401,7 @@ function forest_transitions()
 end
 
 function player_ctrl()
-	--arrow controls
+	--arrow controls	
 	if btn(⬆️) then
 		local canmove = true
 		for i = 1,6 do
@@ -431,6 +431,14 @@ function player_ctrl()
 			cup.x, cup.y, cup.w, cup.h
 		) then
 			canmove = false
+		end
+		for i = 1,4 do
+			if objcollision(
+				cat.x, cat.y - 1, cat.w, cat.h,
+				fence.x[i], fence.y[i], fence.w, fence.h
+			) then
+				canmove = false
+			end
 		end
 		--pos change if able:
 		if canmove then cat.y -= 1 end
@@ -471,6 +479,14 @@ function player_ctrl()
 			cup.x, cup.y, cup.w, cup.h
 		) then
 			canmove = false
+		end
+		for i = 1,4 do
+			if objcollision(
+				cat.x, cat.y + 1, cat.w, cat.h,
+				fence.x[i], fence.y[i], fence.w, fence.h
+			) then
+				canmove = false
+			end
 		end
 		--pos change if able:
 		if canmove then cat.y += 1 end
@@ -514,6 +530,14 @@ function player_ctrl()
 				sfx(4) --water sfx
 			end
 		end
+		for i = 1,4 do
+			if objcollision(
+				cat.x - 1, cat.y, cat.w, cat.h,
+				fence.x[i], fence.y[i], fence.w, fence.h
+			) then
+				canmove = false
+			end
+		end
 		--pos change if able:
 		if canmove then cat.x -= 1 end
 	 if mapCollision(cat.x, cat.y,cat.collision, 0) then cat.x += 1 end
@@ -551,6 +575,14 @@ function player_ctrl()
 				cup.frame = 54
 				cup.flipped = true
 				sfx(4) --water sfx
+			end
+		end
+		for i = 1,4 do
+			if objcollision(
+				cat.x + 1, cat.y, cat.w, cat.h,
+				fence.x[i], fence.y[i], fence.w, fence.h
+			) then
+				canmove = false
 			end
 		end
 		--pos change if able:
