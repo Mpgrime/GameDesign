@@ -117,8 +117,7 @@ function game_init()
 		x={664,664,729,729},y={24,81,24,81},
 		frame={210,210,210,210},w=16,h=16,size=2
 	}
-	--[[still needs to be implemented,
-	should block path in flower puzzle until solved]]
+	--fence blockade
 	fence={
 		x={680,688,696,704},y={8,8,8,8},
 		frame=207,w=8,h=8
