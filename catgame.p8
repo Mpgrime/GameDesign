@@ -353,6 +353,7 @@ function game_update()
 
 		if cage.y < ycircle.y then --if cage is higher than ycircle
 			cage.y = cage.y + .5 --sends cage downward
+			sfx(5)
 		elseif cage.timedown < 5 then
 			cage.timedown = cage.timedown+1
 		else
