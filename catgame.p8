@@ -222,7 +222,7 @@ end
 
 --when in room gameplay
 function game_update()
-	--debug_update()
+	debug_update()
 	
 	flist = { pose, pose, pose }
 
@@ -355,8 +355,11 @@ function game_update()
 	end
 
 	if kingratdefeated then
-		_draw = end_draw()
-		_update = end_update()
+		reset()
+		frame = 1
+		flist = {1, 3, 5}
+		_draw = end_draw
+		_update = end_update
 	end
 end
 
