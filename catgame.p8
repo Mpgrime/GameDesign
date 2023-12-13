@@ -187,6 +187,15 @@ function game_init()
 	--showEnd
 	showend = false
 end
+
+--called when player dies in king rat room
+function kingrat_init()
+	reset_king_buttons(kingbtn)
+	hearts.onscreen = {true, true, true}
+	cat.x = 700
+	cat.y = 180
+end
+
 -->8
 --[update tab]
 
@@ -689,7 +698,7 @@ function kingrat_collide()
 			elseif (hearts.onscreen[1]) then
 				hearts.onscreen[1]=false
 				--Resets stage:
-				game_init() --(CHANGE THIS TO JUST RESET BOSS ROOM)
+				kingrat_init()
 			end
 			sfx(1) -- plays damage sound effect
 		end
