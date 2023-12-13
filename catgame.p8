@@ -231,7 +231,7 @@ end
 
 --when in room gameplay
 function game_update()
-	debug_update()
+	--debug_update()
 	
 	flist = { pose, pose, pose }
 
