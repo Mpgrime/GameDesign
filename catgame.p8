@@ -189,6 +189,15 @@ function game_init()
 	--showEnd
 	showend = false
 end
+
+--called when player dies in king rat room
+function kingrat_init()
+	reset_king_buttons(kingbtn)
+	hearts.onscreen = {true, true, true}
+	cat.x = 700
+	cat.y = 180
+end
+
 -->8
 --[update tab]
 
@@ -357,8 +366,11 @@ function game_update()
 	end
 
 	if kingratdefeated then
-		_draw = end_draw()
-		_update = end_update()
+		reset()
+		frame = 1
+		flist = {1, 3, 5}
+		_draw = end_draw
+		_update = end_update
 	end
 end
 
@@ -696,7 +708,7 @@ function kingrat_collide()
 			elseif (hearts.onscreen[1]) then
 				hearts.onscreen[1]=false
 				--Resets stage:
-				game_init() --(CHANGE THIS TO JUST RESET BOSS ROOM)
+				kingrat_init()
 			end
 			sfx(1) -- plays damage sound effect
 		end
@@ -1156,7 +1168,6 @@ function map_draw()
 	--draws map
 	room_cam(cat)
 	interact_draw()
-	player_draw()
 	props_draw()
 	rat_draw()
 	--debug_draw()
@@ -1171,11 +1182,7 @@ function map_draw()
 	if cage.visible then
 		cage_draw()
 	end
-
-	if showend==true then
-		cls()
-		print("you escaped the house!",275,56)
-	end
+	player_draw()
 end
 
 function player_draw()
