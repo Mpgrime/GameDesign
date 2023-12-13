@@ -184,8 +184,6 @@ function game_init()
 	
 	--is the puzzle solved
 	puzSolve = false
-	--showEnd
-	showend = false
 end
 
 --called when player dies in king rat room
@@ -1163,7 +1161,6 @@ function map_draw()
 	--draws map
 	room_cam(cat)
 	interact_draw()
-	player_draw()
 	props_draw()
 	rat_draw()
 	--debug_draw()
@@ -1178,11 +1175,7 @@ function map_draw()
 	if cage.visible then
 		cage_draw()
 	end
-
-	if showend==true then
-		cls()
-		print("you escaped the house!",275,56)
-	end
+	player_draw()
 end
 
 function player_draw()
