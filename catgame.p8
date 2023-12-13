@@ -453,8 +453,6 @@ function player_ctrl()
 				fence.x[i], fence.y[i], fence.w, fence.h
 			) and flower_solved==false then
 				canmove = false
-				else
-				canmove = true
 			end
 		end
 		--pos change if able:
@@ -503,8 +501,6 @@ function player_ctrl()
 				fence.x[i], fence.y[i], fence.w, fence.h
 			) and flower_solved==false then
 				canmove = false
-				else
-				canmove = true
 			end
 		end
 		--pos change if able:
@@ -555,8 +551,6 @@ function player_ctrl()
 				fence.x[i], fence.y[i], fence.w, fence.h
 			) and flower_solved==false then
 				canmove = false
-				else
-				canmove = true
 			end
 		end
 		--pos change if able:
@@ -604,8 +598,6 @@ function player_ctrl()
 				fence.x[i], fence.y[i], fence.w, fence.h)
 				and flower_solved==false then
 				canmove = false
-				else
-				canmove = true
 			end
 		end
 		--pos change if able:
