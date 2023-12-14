@@ -89,6 +89,9 @@ function game_init()
 		bx={488,456,150,232,400,140},by={94,63,24,106,36,236}, --chair bottom locations
 		w=14,h=16,bw=14,bh=7,frame=42 --chair/chair bottom width/height
 	}
+--	facdoor={
+x={715,723},y={137,127},u=8,h=8,
+size=1,frame={224,208,209,225}
 
 	--magic_sign class/table
 	msign = {
@@ -1073,9 +1076,8 @@ function cprtables(t1,t2)
 	
 	return match
 end
---[[battery cell puzzle:
-plugins will turn green when correct
-battery cell is placed]]
+--{[battery cell puzzle:
+--plugins will turn green when correct battery cell is placed]]
 function factorypuzl(f,t,r)
 	local plug1=false
 	local plug2=false
